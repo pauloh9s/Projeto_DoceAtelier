@@ -19,7 +19,7 @@ Construir uma solução que vise facilitar a gestão de pedidos, com uma persona
 - [ ] Configurar controle de versões e contribuições
 
 ## ⚙️ Funcionalidades 
-### A confeitaraia pode...
+### A confeitaria pode...
 - [ ] Cadastrar novas categorias e novos pratos
 - [ ] Editar categorias e pratos
 - [ ] Deletar categorias e pratos
