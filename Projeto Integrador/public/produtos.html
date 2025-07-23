@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Produtos</title>
+  <link rel="stylesheet" href="css/produtos.css">
+</head>
+<body>
+  <header>
+    <h1>Nossos Produtos</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="produtos.html">Produtos</a>
+      <a href="carrinho.html">Carrinho 🛒 <span id="cart-count">0</span></a>
+    </nav>
+  </header>
+  <main>
+    <div id="listaProdutos"></div>
+  </main>
+  <footer>
+    <p>&copy; 2025 Minha Confeitaria</p>
+  </footer>
+
+  <script>
+    function atualizarContadorCarrinho() {
+      const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+      document.getElementById('cart-count').textContent = carrinho.length;
+    }
+
+    async function carregarProdutos() {
+      const res = await fetch('/api/produtos');
+      const produtos = await res.json();
+      const lista = document.getElementById('listaProdutos');
+      lista.innerHTML = '';
+
+      produtos.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'produto-card';
+
+        card.innerHTML = `
+          <h3>${p.nome}</h3>
+          <img src="${p.imagem_url}" alt="${p.nome}" width="200">
+          <p>Preço: R$ ${p.preco}</p>
+          <button onclick="adicionarAoCarrinho(${p.id})">Adicionar ao Carrinho</button>
+          <button onclick="comprarAgora(${p.id})">Comprar Agora</button>
+        `;
+
+        lista.appendChild(card);
+      });
+    }
+
+    function adicionarAoCarrinho(idProduto) {
+      let carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+      carrinho.push(idProduto);
+      localStorage.setItem('carrinho', JSON.stringify(carrinho));
+      atualizarContadorCarrinho();
+      alert('Produto adicionado!');
+    }
+
+    function comprarAgora(idProduto) {
+      localStorage.setItem('compraDireta', JSON.stringify([idProduto]));
+      window.location.href = 'carrinho.html';
+    }
+
+    carregarProdutos();
+    atualizarContadorCarrinho();
+  </script>
+</body>
+</html>

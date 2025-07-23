@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Encomendas</title>
+  <link rel="stylesheet" href="css/encomendas.css">
+</head>
+
+<body>
+  <header>
+    <h1>Encomendas Recebidas</h1>
+    <nav>
+      <a href="admin.html">Voltar Admin</a>
+    </nav>
+  </header>
+
+  <main>
+    <div id="listaEncomendas"></div>
+  </main>
+
+  <script>
+    async function carregarEncomendas() {
+      const res = await fetch('/api/encomendas', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      const encomendas = await res.json();
+      const lista = document.getElementById('listaEncomendas');
+      lista.innerHTML = '';
+
+      encomendas.forEach(e => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+        <h3>Pedido #${e.id}</h3>
+        <p>Cliente: ${e.cliente_nome} (${e.cliente_email})</p>
+        <p>Endereço: ${e.endereco}, ${e.numero}</p>
+        <p>Pagamento: ${e.forma_pagamento}</p>
+        <p>Produtos: ${e.produtos.map(p => p.nome).join(', ')}</p>
+        <button onclick="deletarEncomenda(${e.id})">Deletar</button>
+      `;
+        lista.appendChild(div);
+      });
+    }
+
+    async function deletarEncomenda(id) {
+      await fetch(`/api/encomendas/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      alert('Encomenda excluída!');
+      carregarEncomendas();
+    }
+
+    carregarEncomendas();
+  </script>
+
+</body>
+
+</html>
