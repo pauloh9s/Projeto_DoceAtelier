@@ -10,6 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/pauloh9s/Projeto_DoceAtelier.git"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
@@ -17,10 +18,10 @@
   },
   "homepage": "https://github.com/pauloh9s/Projeto_DoceAtelier#readme",
   "dependencies": {
-    "body-parse": "^0.1.0",
-    "cors": "^2.8.5",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
     "express": "^5.1.0",
-    "mysql2": "^3.14.1",
-    "sequelize": "^6.37.7"
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3"
   }
 }

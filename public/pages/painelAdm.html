@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Área Administrativa</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+
+<body>
+  <header>
+    <h1>Admin - Confeitaria</h1>
+    <nav>
+      <a href="produtos.html">Ver Loja</a>
+      <button onclick="logout()">Sair</button>
+    </nav>
+  </header>
+
+  <main>
+ 
+    <section id="crudSection" style="display:none;">
+      <h2>Gerenciar Produtos</h2>
+      <form onsubmit="criarProduto(event)">
+        <input type="text" id="nome" placeholder="Nome" required>
+        <input type="number" id="preco" placeholder="Preço" required>
+        <input type="text" id="imagem_url" placeholder="URL da imagem" required>
+        <button type="submit">Adicionar Produto</button>
+      </form>
+
+      <h3>Produtos Cadastrados:</h3>
+      <div id="listaProdutosAdmin"></div>
+    </section>
+  </main>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    //Confere o token
+    if (token) {
+      document.getElementById('crudSection').style.display = 'block'; // Exibe o trecho de crud
+      carregarProdutosAdmin(); // Chamar função para carregar os produtos
+    }
+
+
+    async function criarProduto(e) {
+      e.preventDefault();
+      const data = {
+        nome: document.getElementById('nome').value,
+        preco: document.getElementById('preco').value,
+        imagem_url: document.getElementById('imagem_url').value
+      };
+
+      await fetch('/api/produtos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // Verifica se o token esta ativo pra autorizar a ação
+        },
+        body: JSON.stringify(data)
+      });
+
+      alert('Produto criado!');
+      carregarProdutosAdmin();
+    }
+
+    async function carregarProdutosAdmin() {
+      const res = await fetch('/api/produtos');
+      const produtos = await res.json();
+      const lista = document.getElementById('listaProdutosAdmin');
+      lista.innerHTML = '';
+
+      produtos.forEach(p => {
+        const div = document.createElement('div');
+        div.innerHTML = `
+    <h4>${p.nome} - R$ ${p.preco}</h4>
+    <button onclick="editarProduto(${p.id}, '${p.nome}', ${p.preco}, '${p.imagem_url}')">Editar</button>
+    <button onclick="deletarProduto(${p.id})">Deletar</button>
+  `;
+        lista.appendChild(div);
+      });
+
+    }
+
+    async function deletarProduto(id) {
+      await fetch(`/api/produtos/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      carregarProdutosAdmin();
+    }
+
+    function editarProduto(id, nomeAtual, precoAtual, imagemUrlAtual) {
+      const novoNome = prompt('Novo nome:', nomeAtual);
+      const novoPreco = prompt('Novo preço:', precoAtual);
+      const novaImagem = prompt('Nova URL da imagem:', imagemUrlAtual);
+
+      fetch(`/api/produtos/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          nome: novoNome,
+          preco: novoPreco,
+          imagem_url: novaImagem
+        })
+      }).then(() => {
+        alert('Produto atualizado!');
+        carregarProdutosAdmin();
+      });
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.reload();
+    }
+  </script>
+</body>
+
+</html>

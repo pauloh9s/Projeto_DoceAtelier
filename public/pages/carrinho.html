@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carrinho</title>
+  <link rel="stylesheet" href="../css/carrinho.css">
+</head>
+<body>
+  <header>
+    <h1>Seu Carrinho</h1>
+    <nav>
+      <a href="../index.html">Home</a>
+      <a href="./produtos.html">Produtos</a>
+      <a href="./carrinho.html">Carrinho 🛒 <span id="cart-count">0</span></a>
+    </nav>
+  </header>
+  <main>
+    <div id="listaCarrinho"></div>
+    <p>Total: R$ <span id="totalCarrinho">0.00</span></p>
+    <button onclick="mostrarFormulario()">Finalizar Compra</button>
+
+    <div id="formularioCompra" style="display:none;">
+      <h2>Informações para entrega</h2>
+      <form onsubmit="enviarEncomenda(event)">
+        <label>Nome:<input type="text" id="cliente_nome" required></label><br>
+        <label>Email:<input type="email" id="cliente_email" required></label><br>
+        <label>Endereço:<input type="text" id="endereco" required></label><br>
+        <label>Número:<input type="text" id="numero" required></label><br>
+        <label>Forma de pagamento:
+          <select id="forma_pagamento">
+            <option>Pix</option>
+            <option>Dinheiro</option>
+            <option>Cartão</option>
+          </select>
+        </label><br>
+        <button type="submit">Enviar Pedido</button>
+      </form>
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2025 Minha Confeitaria</p>
+  </footer>
+
+  <script>
+    let idsSelecionados = [];
+
+    function atualizarContadorCarrinho() {
+      const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+      document.getElementById('cart-count').textContent = carrinho.length;
+    }
+
+    async function carregarCarrinho() {
+      let ids = JSON.parse(localStorage.getItem('compraDireta'));
+      if (!ids || ids.length === 0) {
+        ids = JSON.parse(localStorage.getItem('carrinho') || '[]');
+      }
+      idsSelecionados = ids;
+
+      const produtos = await fetch('/api/produtos').then(res => res.json());
+      const lista = document.getElementById('listaCarrinho');
+      lista.innerHTML = '';
+
+      let total = 0;
+      ids.forEach(id => {
+        const p = produtos.find(prod => prod.id === id);
+        if (p) {
+          const div = document.createElement('div');
+          div.innerHTML = `<h4>${p.nome}</h4><p>R$ ${p.preco}</p>`;
+          lista.appendChild(div);
+          total += parseFloat(p.preco);
+        }
+      });
+      document.getElementById('totalCarrinho').textContent = total.toFixed(2);
+    }
+
+    function mostrarFormulario() {
+      document.getElementById('formularioCompra').style.display = 'block';
+    }
+
+    async function enviarEncomenda(e) {
+      e.preventDefault();
+      const data = {
+        cliente_nome: document.getElementById('cliente_nome').value,
+        cliente_email: document.getElementById('cliente_email').value,
+        endereco: document.getElementById('endereco').value,
+        numero: document.getElementById('numero').value,
+        forma_pagamento: document.getElementById('forma_pagamento').value,
+        produtos: idsSelecionados.map(id => ({ id }))
+      };
+
+      await fetch('/api/encomendas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      alert('Pedido enviado!');
+      localStorage.removeItem('carrinho');
+      localStorage.removeItem('compraDireta');
+      window.location.href = '/';
+    }
+
+    carregarCarrinho();
+    atualizarContadorCarrinho();
+  </script>
+</body>
+</html>

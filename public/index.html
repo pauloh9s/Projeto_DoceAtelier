@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Minha Confeitaria</title>
+  <link rel="stylesheet" href="./css/style.css">
+</head>
+<body>
+  <header>
+    <h1>Bem-vindo à Confeitaria!</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="./pages/produtos.html">Produtos</a>
+      <a href="./pages/carrinho.html">Carrinho 🛒 <span id="cart-count">0</span></a>
+    </nav>
+  </header>
+  <main>
+    <h2>Delícias te esperam!</h2>
+    <p>Escolha seus doces favoritos na aba Produtos.</p>
+  </main>
+  <footer>
+    <p>&copy; 2025 Minha Confeitaria</p>
+  </footer>
+
+  <script>
+    function atualizarContadorCarrinho() {
+      const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+      document.getElementById('cart-count').textContent = carrinho.length;
+    }
+    atualizarContadorCarrinho();
+  </script>
+</body>
+</html>
