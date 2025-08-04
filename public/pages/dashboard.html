@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Área Administrativa</title>
+  <link rel="stylesheet" href="../css/admin.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-amber-50 font-sans antialiased text-gray-800">
+
+  <header class="bg-white shadow-md py-4 fixed w-full top-0 z-50">
+    <div class="container mx-auto px-6 flex justify-between items-center">
+      <h1 class="text-3xl font-extrabold tracking-tight">
+        <a href="#" class="text-amber-800 hover:text-amber-600 transition-colors">
+          DashBoard - Confeitaria
+        </a>
+      </h1>
+      <nav class="flex items-center space-x-4">
+        <a href="produtos.html" class="text-amber-800 hover:text-amber-600 transition-colors font-semibold text-lg">Ver
+          Loja</a>
+        <a href="encomendas.html"
+          class="text-amber-800 hover:text-amber-600 transition-colors font-semibold text-lg">Encomendas</a>
+        <a href="./cadastroprodutos.html"
+          class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg">Cadastrar
+          Produto</a>
+        <button onclick="logout()"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-colors">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <div class="pt-24">
+    <main class="container mx-auto px-6 py-8">
+      <section id="crudSection" style="display:none;">
+
+        <h2 class="text-4xl font-extrabold text-amber-800 mb-8 text-center">Gerenciar Produtos</h2>
+
+        <div class="mt-8">
+          <h2 class="text-3xl font-bold text-amber-800 mb-6">Produtos Cadastrados</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="listaProdutosAdmin">
+            <div
+              class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-105 transition-all duration-300">
+              <img src="https://via.placeholder.com/400x300" alt="Imagem do Produto" class="w-full h-48 object-cover">
+              <div class="p-6">
+                <h3 class="text-xl font-semibold mb-2">Nome do Produto</h3>
+                <p class="text-gray-600 mb-4">Descrição curta do produto.</p>
+                <div class="flex justify-between items-center">
+                  <span class="text-2xl font-bold text-amber-600">R$ 29,99</span>
+                  <div class="space-x-2">
+                    <button
+                      class="bg-yellow-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-yellow-600 transition-colors">Editar</button>
+                    <button
+                      class="bg-red-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-600 transition-colors">Excluir</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="crud-modal"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden backdrop-blur-sm">
+          <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-8 relative">
+            <button id="closeModal"
+              class="absolute top-4 right-4 text-gray-600 hover:text-black transition-colors text-3xl">
+              &times;
+            </button>
+
+            <h3 class="text-3xl font-extrabold text-amber-800 mb-6 text-center tracking-wide">Editar Produto</h3>
+
+            <form id="modal-form">
+              <div class="grid gap-6 md:grid-cols-2">
+                <div>
+                  <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nome</label>
+                  <input type="text" id="name"
+                    class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                    placeholder="Digite o nome" required />
+                </div>
+                <div>
+                  <label for="price" class="block text-sm font-semibold text-gray-700 mb-1">Preço</label>
+                  <input type="number" id="price"
+                    class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                    placeholder="R$ 100,00" required />
+                </div>
+                <div class="md:col-span-2">
+                  <label for="category" class="block text-sm font-semibold text-gray-700 mb-1">Categoria</label>
+                  <select id="category"
+                    class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200">
+                    <option value="TV">TV/Monitores</option>
+                    <option value="PC">PC</option>
+                    <option value="GA">Jogos/Console</option>
+                    <option value="PH">Celulares</option>
+                  </select>
+                </div>
+                <div class="md:col-span-2">
+                  <label for="description" class="block text-sm font-semibold text-gray-700 mb-1">Descrição</label>
+                  <textarea id="description" rows="3"
+                    class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 resize-none"
+                    placeholder="Descreva o produto..."></textarea>
+                </div>
+                <div class="md:col-span-2">
+                  <label for="image" class="block text-sm font-semibold text-gray-700 mb-1">Imagem</label>
+                  <input type="text" id="image"
+                    class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+                    placeholder="URL da imagem" />
+                </div>
+
+                <button type="submit"
+                  class="md:col-span-2 w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-white">
+                  Atualizar Produto
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <footer class="bg-amber-900 text-white py-8">
+    <div class="container mx-auto px-6">
+      <div class="flex flex-col md:flex-row justify-between items-center">
+        <div class="mb-4 md:mb-0 flex flex-col items-center md:items-center">
+          <a href="#" class="text-2xl font-bold text-white hover:text-amber-200 transition">
+            <img id="img-logo" src="img/Doce_Atelier-Logo-PB.png" alt="Doçura">
+          </a>
+          <p class="mt-2 text-white">Confeitaria Artesanal</p>
+        </div>
+        <div class="flex flex-col items-center md:items-end">
+          <p>&copy; 2025 Doçura. Todos os direitos reservados.</p>
+          <p class="text-amber-200">Cardápio Digital</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+  <script>
+    const token = localStorage.getItem('token');
+
+    // Confere o token
+    if (token) {
+      document.getElementById('crudSection').style.display = 'block'; // Exibe o trecho de CRUD
+      carregarProdutosAdmin(); // Chamar função para carregar os produtos
+    }
+
+    async function carregarProdutosAdmin() {
+      const res = await fetch('/api/produtos');
+      const produtos = await res.json();
+      const lista = document.getElementById('listaProdutosAdmin');
+      lista.innerHTML = '';
+
+      produtos.forEach(p => {
+        const div = document.createElement('div');
+        div.classList.add('border', 'p-4', 'rounded-lg');
+
+        div.innerHTML = `
+          <h4 class="text-lg font-semibold p-2">${p.nome} - R$ ${p.preco}</h4>  `;
+        // <button onclick="deletarProduto(${p.id})" class="text-red-500 hover:text-red-700">Deletar</button>
+
+        const divButtons = document.createElement('div')
+        divButtons.classList.add('p-4', 'flex', 'flex-row')
+
+        // Criar o botão dinamicamente para abrir o modal
+        // Criar o botão dinamicamente para abrir o modal
+        const modalButton = document.createElement('button');
+        modalButton.textContent = 'Editar Produto';
+        modalButton.classList.add(
+          'block',
+          'text-white',
+          'bg-[#f8b500]',           // Alteração aqui para o fundo amarelo
+          'hover:bg-[#f7a100]',      // Hover em um tom mais escuro de amarelo
+          'focus:ring-4',
+          'focus:outline-none',
+          'focus:ring-[#f8b500]',    // Cor de foco com o mesmo tom de amarelo
+          'font-medium',
+          'rounded-lg',
+          'text-sm',
+          'p-2',
+          'mx-5',
+          'text-center',
+          'dark:bg-[#f8b500]',       // Fundo em amarelo também no modo escuro
+          'dark:hover:bg-[#f7a100]', // Hover no modo escuro
+          'dark:focus:ring-[#f8b500]' // Foco no modo escuro
+        );
+
+        modalButton.setAttribute('data-modal-target', 'crud-modal');
+        modalButton.setAttribute('data-modal-toggle', 'crud-modal');
+
+        modalButton.addEventListener('click', function () {
+          // Preencher o modal
+          document.getElementById('name').value = p.nome;
+          document.getElementById('price').value = p.preco;
+          document.getElementById('image').value = p.imagem_url;
+          document.getElementById('category').value = p.categoria;
+          document.getElementById('description').value = p.descricao;
+
+          // Exibir modal
+          document.getElementById('crud-modal').classList.remove('hidden');
+          document.getElementById('crud-modal').classList.add('flex');
+
+          // Atualizar produto no submit
+          const form = document.getElementById('modal-form');
+          form.onsubmit = async function (e) {
+            e.preventDefault();
+
+            const atualizado = {
+              nome: document.getElementById('name').value,
+              preco: document.getElementById('price').value,
+              imagem_url: document.getElementById('image').value,
+              categoria: document.getElementById('category').value,
+              descricao: document.getElementById('description').value,
+            };
+
+            try {
+              await fetch(`/api/produtos/${p.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                body: JSON.stringify(atualizado)
+              });
+              alert("Produto atualizado!");
+              document.getElementById('crud-modal').classList.add('hidden');
+              carregarProdutosAdmin();
+            } catch (err) {
+              console.error(err);
+              alert("Erro ao atualizar produto.");
+            }
+          };
+        });
+
+        const botao = document.createElement('button');
+        botao.textContent = 'Deletar';
+        botao.className = 'text-red-500 hover:text-red-700 mx-5';
+        botao.onclick = () => deletarProduto(p.id);
+
+        // Adicionando o botão ao div de cada produto
+        divButtons.appendChild(modalButton);
+        divButtons.appendChild(botao);
+        div.appendChild(divButtons)
+        // Adicionando o div de produto à lista
+        lista.appendChild(div);
+      });
+    }
+
+    async function deletarProduto(id) {
+      try {
+        const resposta = await fetch(`/api/produtos/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (!resposta.ok) {
+          throw new Error(`Erro ao deletar produto: ${resposta.status}`);
+        }
+        carregarProdutosAdmin();
+      } catch (erro) {
+        console.error('Erro ao deletar produto:', erro);
+        alert('Não foi possível deletar o produto. Verifique o console.');
+      }
+    }
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.reload();
+    }
+
+    document.getElementById('closeModal').addEventListener('click', () => {
+      const modal = document.getElementById('crud-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('crud-modal').classList.add('hidden');
+        document.getElementById('crud-modal').classList.remove('flex');
+      }
+    });
+
+  </script>
+  <script src="https://unpkg.com/flowbite@latest/dist/flowbite.min.js"></script>
+  <script src="https://unpkg.com/flowbite@latest/dist/flowbite.js"></script>
+</body>
+
+</html>

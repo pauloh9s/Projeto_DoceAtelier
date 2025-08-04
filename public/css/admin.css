@@ -20,6 +20,20 @@ nav a, nav button {
   cursor: pointer;
 }
 
+<<<<<<< Updated upstream
+=======
+h2 a {
+  margin: 0 10px;
+  text-decoration: none;
+  background: #f8b500;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+>>>>>>> Stashed changes
 main {
   padding: 20px;
 }
@@ -42,3 +56,16 @@ button {
   padding: 5px 10px;
   cursor: pointer;
 }
+<<<<<<< Updated upstream
+=======
+
+div button {
+  background: #f8b500;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  margin: 7px 0px;
+  cursor: pointer;
+   border-radius: 5px;
+}
+>>>>>>> Stashed changes

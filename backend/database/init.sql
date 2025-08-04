@@ -7,12 +7,30 @@ CREATE TABLE IF NOT EXISTS usuarios (
 INSERT INTO usuarios (username, senha_hash)
 VALUES ('admin', '$2b$10$cRGfwvfTAsFVjM3iD3WGae6YiCEEp5o5469NeSjpGXcFWdHq150/6');
 
+<<<<<<< Updated upstream
+=======
+-- Categorias
+CREATE TABLE IF NOT EXISTS categorias (
+  nome TEXT PRIMARY KEY NOT NULL,
+  descricao TEXT
+);
+
+INSERT INTO categorias (nome) VALUES ('doces');
+
+>>>>>>> Stashed changes
 -- Produtos
 CREATE TABLE IF NOT EXISTS produtos (
   id SERIAL PRIMARY KEY,
   nome TEXT NOT NULL,
   preco NUMERIC(10,2) NOT NULL,
+<<<<<<< Updated upstream
   imagem_url TEXT
+=======
+  imagem_url TEXT,
+  descricao VARCHAR(255),
+  nome_categoria TEXT,
+  FOREIGN KEY (nome_categoria) REFERENCES categorias(nome)
+>>>>>>> Stashed changes
 );
 
 -- Encomendas
