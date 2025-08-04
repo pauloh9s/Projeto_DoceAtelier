@@ -1,12 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Playball&family=Poppins:wght@400;500&display=swap');
 
 body {
-<<<<<<< Updated upstream
     background-color: #fdf5ec;
     /* background-color: white; */
-=======
-    background-color: #fdf5ec; /* Mantido para um fundo suave, semelhante a amber-50 */
->>>>>>> Stashed changes
     display: flex;
     justify-content: center;
     align-items: center;
@@ -33,11 +29,7 @@ body {
 .logo {
     font-family: 'Playball', cursive;
     font-size: 6rem;
-<<<<<<< Updated upstream
     color: #e4b3a5;
-=======
-    color: #e4b3a5; /* Mantido para um tom mais suave */
->>>>>>> Stashed changes
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
     margin-bottom: 20px;
     display: flex;
@@ -57,16 +49,10 @@ body {
 }
 
 .login-box {
-<<<<<<< Updated upstream
     background-color: #e4b3a5;
     padding: 40px;
     border-radius: 25px;
     /* box-shadow: -10px 10px 15px rgba(0, 0, 0, 1.5), -10px -10px 15px rgba(255, 255, 255, 0.7); */
-=======
-    background-color: #e4b3a5; /* Mantido para manter a harmonia do login box */
-    padding: 40px;
-    border-radius: 25px;
->>>>>>> Stashed changes
     box-shadow: -10px 10px 15px rgba(211, 160, 145, 0.5), -10px -10px 15px rgba(255, 255, 255, 0.7);
     width: 300px;
 }
@@ -74,11 +60,7 @@ body {
 .login-logo {
     font-family: 'Playball', cursive;
     font-size: 2rem;
-<<<<<<< Updated upstream
     color: #fdf5ec;
-=======
-    color: #fdf5ec; /* Mantido para manter a harmonia do login box */
->>>>>>> Stashed changes
     text-align: center;
     margin-bottom: 30px;
 }
@@ -91,20 +73,14 @@ body {
 }
 
 .input-field {
-<<<<<<< Updated upstream
     background-color: #fdf5ec;
     border: 1px solid #d3a091;
-=======
-    background-color: #fdf5ec; /* Cor de fundo creme para o input */
-    border: 2px solid #d3a091; /* Cor da borda mais suave */
->>>>>>> Stashed changes
     border-radius: 10px;
     width: 100%;
     padding: 15px;
     margin-bottom: 20px;
     box-sizing: border-box;
     font-size: 1rem;
-<<<<<<< Updated upstream
     border: 2px solid #d3a091;
     color: #b08a7e;
 
@@ -123,48 +99,22 @@ input:focus {
     /* Cor da borda quando o input está selecionado */
     outline: none;
     /* Remove o outline padrão do navegador (opcional) */
-=======
-    color: #b08a7e; /* Cor do texto dentro do input */
-}
-
-input::placeholder {
-    color: #d3a091; /* Cor do placeholder */
-    opacity: 1;
-}
-
-input:focus {
-    border-color: #b08a7e; /* Cor da borda ao focar para combinar com o texto */
-    outline: none;
->>>>>>> Stashed changes
 }
 
 .login-button {
     box-sizing: border-box;
-<<<<<<< Updated upstream
     background-color: #fdf5ec;
     border: 2px solid #d3a091;
-=======
-    background-color: #fdf5ec; /* Fundo do botão */
-    border: 2px solid #d3a091; /* Borda do botão */
->>>>>>> Stashed changes
     border-radius: 10px;
     width: 100%;
     padding: 15px;
     font-size: 1.2rem;
-<<<<<<< Updated upstream
     color: #b08a7e;
-=======
-    color: #b08a7e; /* Cor do texto do botão */
->>>>>>> Stashed changes
     cursor: pointer;
     transition: background-color 0.3s ease;
     text-align: center;
 }
 
 .login-button:hover {
-<<<<<<< Updated upstream
     background-color: #f5e9da;
-=======
-    background-color: #f5e9da; /* Efeito de hover mais sutil */
->>>>>>> Stashed changes
 }
