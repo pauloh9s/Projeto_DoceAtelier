@@ -1,15 +1,36 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
+const fs = require('fs');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
 const pool = require('./database/db')
 const createDatabase = require('./database/createDatabase')
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
 // Middlewares
+// Define onde salvar as imagens e com que nome
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, path.join(__dirname, 'uploads')); // Salva as imagens na pasta "uploads" do projeto
+  },
+  filename: (req, file, cb) => {
+    const uniqueName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueName); // Gera um nome único para cada imagem
+  }
+});
+
+const upload = multer({ storage });
+app.use('/uploads', express.static('uploads'));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static('public'));
 app.use(express.static(path.join(__dirname, '..', 'public')));
@@ -34,7 +55,7 @@ app.post('/api/login', async (req, res) => {
     console.log('Dados recebidos:', { username, senha });
 
     console.log('Antes do SELECT');
-    const {rows} = await pool.query('SELECT * FROM usuarios WHERE username = $1', [username]);
+    const { rows } = await pool.query('SELECT * FROM usuarios WHERE username = $1', [username]);
     console.log('Depois do SELECT');
 
     const user = rows[0];
@@ -79,23 +100,67 @@ app.get('/api/produtos', async (req, res) => {
 });
 
 // Adiciona novo Produto
-app.post('/api/produtos', authenticateToken, async (req, res) => {
-  const { nome, preco, imagem_url } = req.body;
-  await pool.query(
-    'INSERT INTO produtos (nome, preco, imagem_url) VALUES ($1, $2, $3)',
-    [nome, preco, imagem_url]
-  );
-  res.sendStatus(201);
+app.post('/api/produtos', authenticateToken, upload.single('imagem'), async (req, res) => {
+  console.log('Arquivo recebido:', req.file); // Verifica o arquivo enviado
+  const { nome, preco, descricao, nome_categoria } = req.body;
+  
+  const imagem_url = req.file ? `/uploads/${req.file.filename}` : null;
+
+  console.log('Imagem URL:', imagem_url); // Verifica a URL da imagem
+
+  try {
+    await pool.query(
+      'INSERT INTO produtos (nome, preco, imagem_url, descricao, nome_categoria) VALUES ($1, $2, $3, $4, $5)',
+      [nome, preco, imagem_url, descricao, nome_categoria]
+    );
+    res.sendStatus(201);
+  } catch (error) {
+    console.error('Erro ao salvar produto:', error);
+    res.status(500).send(`Erro ao inserir produto: ${error.message}`);
+  }
 });
 
 //Editar Produto
 app.put('/api/produtos/:id', authenticateToken, async (req, res) => {
-  const { nome, preco, imagem_url } = req.body;
+  const { nome, preco, imagem_url, descricao, nome_categoria } = req.body;
   await pool.query(
-    'UPDATE produtos SET nome = $1, preco = $2, imagem_url = $3 WHERE id = $4',
-    [nome, preco, imagem_url, req.params.id]
+    'UPDATE produtos SET nome = $1, preco = $2, imagem_url = $3, descricao = $4, nome_categoria = $5 WHERE id = $6',
+    [nome, preco, imagem_url, descricao, nome_categoria, req.params.id]
   );
   res.sendStatus(200);
+});
+
+//Deletar Produto
+app.delete('/api/produtos/:id', authenticateToken, async (req, res) => {
+  const produtoId = req.params.id;
+
+  try {
+    // 1. Buscar o produto para saber o nome da imagem
+    const result = await pool.query('SELECT imagem_url FROM produtos WHERE id = $1', [produtoId]);
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ erro: 'Produto não encontrado' });
+    }
+
+    const nomeImagem = result.rows[0].imagem;
+
+    // 2. Deletar o arquivo da imagem, se existir
+    if (nomeImagem) {
+      const caminhoImagem = path.join(__dirname, 'uploads', nomeImagem);
+
+      if (fs.existsSync(caminhoImagem)) {
+        fs.unlinkSync(caminhoImagem); // remove o arquivo da pasta uploads
+      }
+    }
+
+    // 3. Deletar o produto do banco
+    await pool.query('DELETE FROM produtos WHERE id = $1', [produtoId]);
+
+    res.sendStatus(200);
+  } catch (error) {
+    console.error('Erro ao deletar produto:', error);
+    res.status(500).json({ erro: 'Erro ao deletar produto' });
+  }
 });
 
 // Encomendas
@@ -136,5 +201,10 @@ app.get('/api/encomendas', authenticateToken, async (req, res) => {
 app.delete('/api/encomendas/:id', authenticateToken, async (req, res) => {
   await pool.query('DELETE FROM encomendas WHERE id = $1', [req.params.id]);
   res.sendStatus(200);
+});
+
+app.get('/api/categorias', async (req, res) => {
+  const { rows } = await pool.query('SELECT * FROM categorias');
+  res.json(rows);
 });
 

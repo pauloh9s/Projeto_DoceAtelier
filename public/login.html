@@ -48,11 +48,7 @@
                     const result = await res.json();
                     localStorage.setItem('token', result.token); //verifica o token
                     alert('Logado com sucesso!');
-<<<<<<< Updated upstream
-                    window.location.href = './pages/painelAdm.html'; // Redireciona para a próxima página
-=======
                     window.location.href = './pages/dashboard.html'; // Redireciona para a próxima página
->>>>>>> Stashed changes
                 } else {
                     alert('Credenciais inválidas!');
                 }
