@@ -3,56 +3,188 @@
 
 <head>
   <meta charset="UTF-8" />
-  <title>Encomendas</title>
-  <link rel="stylesheet" href="../css/encomendas.css">
+  <title>Encomendas - Doce Atelier</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
 </head>
 
-<body>
-  <header>
-    <h1>Encomendas Recebidas</h1>
-    <nav>
-      <a href="./dashboard.html">Voltar Admin</a>
-    </nav>
+<body class="bg-amber-50 antialiased text-gray-800">
+
+  <div id="alert-message" class="hidden fixed top-0 left-1/2 -translate-x-1/2 mt-4 z-50 w-full max-w-lg mx-auto px-4">
+  </div>
+
+  <header class="bg-white shadow-md py-4 fixed w-full top-0 z-40">
+    <div class="container mx-auto px-6 flex justify-between items-center">
+      <h1 class="text-3xl font-extrabold tracking-tight">
+        <a href="./dashboard.html" class="text-amber-800 hover:text-amber-600 transition-colors">
+          Minhas Encomendas
+        </a>
+      </h1>
+      <nav>
+        <a href="./dashboard.html"
+          class="text-amber-800 hover:text-amber-600 transition-colors font-semibold text-lg">Voltar</a>
+      </nav>
+    </div>
   </header>
 
-  <main>
-    <div id="listaEncomendas"></div>
-  </main>
+  <div class="pt-24">
+    <main class="container mx-auto px-6 py-12">
+      <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-amber-800 text-center mb-12">
+        Pedidos Recebidos
+      </h2>
+
+      <div id="listaEncomendas" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      </div>
+    </main>
+  </div>
+
+  <footer class="bg-amber-900 text-white py-8 mt-auto">
+    <div class="container mx-auto px-6 text-center">
+      <p>&copy; 2025 Minha Confeitaria. Todos os direitos reservados.</p>
+    </div>
+  </footer>
 
   <script>
-    async function carregarEncomendas() {
-      const res = await fetch('/api/encomendas', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
-      const encomendas = await res.json();
-      const lista = document.getElementById('listaEncomendas');
-      lista.innerHTML = '';
+    function showAlert(message, type) {
+      const alertBox = document.getElementById('alert-message');
+      let colorClasses = '';
+      let iconPath = '';
 
-      encomendas.forEach(e => {
-        const div = document.createElement('div');
-        div.innerHTML = `
-        <h3>Pedido #${e.id}</h3>
-        <p>Cliente: ${e.cliente_nome} (${e.cliente_email})</p>
-        <p>Endereço: ${e.endereco}, ${e.numero}</p>
-        <p>Pagamento: ${e.forma_pagamento}</p>
-        <p>Produtos: ${e.produtos.map(p => p.nome).join(', ')}</p>
-        <button onclick="deletarEncomenda(${e.id})">Deletar</button>
-      `;
-        lista.appendChild(div);
-      });
+      if (type === 'success') {
+        colorClasses = 'text-green-800 border-green-300 bg-green-50';
+        iconPath = `<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm9.5 9.5h-10a1 1 0 0 1 0-2h10a1 1 0 0 1 0 2Z"/>`;
+      } else if (type === 'error') {
+        colorClasses = 'text-red-800 border-red-300 bg-red-50';
+        iconPath = `<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4H9a1 1 0 0 1 0-2h2a1 1 0 1 1 0 2Z"/>`;
+      }
+
+      alertBox.innerHTML = `
+                <div class="flex items-center p-4 rounded-xl border-t-4 shadow-lg ${colorClasses}" role="alert">
+                    <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        ${iconPath}
+                    </svg>
+                    <div class="ml-3 text-sm font-medium">
+                        ${message}
+                    </div>
+                    <button type="button" onclick="hideAlert()" class="ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg focus:ring-2 inline-flex items-center justify-center h-8 w-8">
+                        <span class="sr-only">Fechar</span>
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+      alertBox.classList.remove('hidden');
+
+      setTimeout(() => {
+        hideAlert();
+      }, 3000);
+    }
+
+    function hideAlert() {
+      document.getElementById('alert-message').classList.add('hidden');
+    }
+
+    async function carregarEncomendas() {
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          window.location.href = './login.html'; // Redireciona para o login se não houver token
+          return;
+        }
+
+        const res = await fetch('/api/encomendas', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (res.status === 401) {
+          window.location.href = './login.html';
+          return;
+        }
+
+        const encomendas = await res.json();
+        const lista = document.getElementById('listaEncomendas');
+        lista.innerHTML = '';
+
+        if (encomendas.length === 0) {
+          lista.innerHTML = `<p class="text-center text-xl text-gray-500 col-span-full">Nenhuma encomenda recebida ainda.</p>`;
+          return;
+        }
+
+        encomendas.forEach(e => {
+          const card = document.createElement('div');
+          card.className = 'bg-white rounded-2xl shadow-xl p-6 flex flex-col space-y-4 transform hover:scale-105 transition-all duration-300';
+
+          const produtosHTML = e.produtos.map(p => `<span class="bg-amber-100 text-amber-800 text-xs font-semibold px-2.5 py-0.5 rounded-full">${p.nome}</span>`).join(' ');
+
+          card.innerHTML = `
+                        <div class="flex justify-between items-center border-b pb-4">
+                            <h3 class="text-2xl font-extrabold text-amber-800">Pedido #${e.id}</h3>
+                            <span class="text-gray-500 text-sm">Recebido em: ${new Date(e.data_criacao).toLocaleDateString()}</span>
+                        </div>
+                        
+                        <div>
+                            <p class="text-lg font-semibold text-gray-700">Cliente: <span class="font-normal">${e.cliente_nome}</span></p>
+                            <p class="text-sm text-gray-500">Email: ${e.cliente_email}</p>
+                        </div>
+                        
+                        <div>
+                            <p class="text-lg font-semibold text-gray-700">Endereço de Entrega:</p>
+                            <p class="text-base text-gray-600">${e.endereco}, ${e.numero}</p>
+                            <p class="text-base text-gray-600">Forma de Pagamento: ${e.forma_pagamento}</p>
+                        </div>
+
+                        <div>
+                            <p class="text-lg font-semibold text-gray-700 mb-2">Produtos:</p>
+                            <div class="flex flex-wrap gap-2">
+                                ${produtosHTML}
+                            </div>
+                        </div>
+
+                        <button onclick="deletarEncomenda(${e.id})" class="mt-4 bg-red-600 text-white font-bold py-3 px-6 rounded-xl hover:bg-red-700 transition-colors shadow-md">
+                            <i class="fas fa-trash-alt mr-2"></i>Deletar Encomenda
+                        </button>
+                    `;
+          lista.appendChild(card);
+        });
+
+      } catch (error) {
+        console.error("Erro ao carregar encomendas:", error);
+        showAlert('Não foi possível carregar as encomendas. Tente novamente mais tarde.', 'error');
+      }
     }
 
     async function deletarEncomenda(id) {
-      await fetch(`/api/encomendas/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+      if (confirm(`Tem certeza que deseja deletar o pedido #${id}?`)) {
+        try {
+          const res = await fetch(`/api/encomendas/${id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('token')}`
+            }
+          });
+
+          if (res.ok) {
+            showAlert('Encomenda excluída com sucesso!', 'success');
+            carregarEncomendas();
+          } else {
+            throw new Error('Erro ao excluir encomenda.');
+          }
+        } catch (error) {
+          console.error("Erro ao deletar encomenda:", error);
+          showAlert('Ocorreu um erro ao excluir a encomenda. Tente novamente.', 'error');
         }
-      });
-      alert('Encomenda excluída!');
-      carregarEncomendas();
+      }
     }
 
     carregarEncomendas();

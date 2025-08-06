@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <title>Minha Confeitaria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -14,36 +15,51 @@
 </head>
 <body class="bg-amber-50 antialiased text-gray-800">
     
-    <header class="bg-white shadow-md py-4 fixed w-full top-0 z-50">
-        <div class="container mx-auto px-6 flex justify-between items-center">
-            <h1 class="text-3xl font-extrabold tracking-tight">
-                <a href="index.html" class="text-amber-800 hover:text-amber-600 transition-colors">
-                    Minha Confeitaria
+    <div id="product-added-alert" class="hidden fixed top-0 left-1/2 -translate-x-1/2 mt-4 z-50 w-full max-w-lg mx-auto px-4">
+        <div class="flex items-center p-4 rounded-xl text-green-800 border-t-4 border-green-300 bg-green-50 shadow-lg" role="alert">
+            <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm9.5 9.5h-10a1 1 0 0 1 0-2h10a1 1 0 0 1 0 2Z"/>
+            </svg>
+            <div class="ml-3 text-sm font-medium">
+                Produto adicionado ao carrinho com sucesso!
+            </div>
+            <button type="button" onclick="hideAlert()" class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 inline-flex items-center justify-center h-8 w-8">
+                <span class="sr-only">Fechar</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    
+    <header class="bg-white shadow-md py-4 fixed w-full top-0 z-40">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                <a href="./index.html" class="flex items-center">
+                    <img src="../assets/Doce_Atelier-logo.png" alt="Logo da Minha Confeitaria" class="h-12 sm:h-16">
                 </a>
             </h1>
-            <nav class="flex items-center space-x-6">
-                <a href="index.html" class="text-amber-800 hover:text-amber-600 transition-colors font-semibold text-lg">Home</a>
-                <a href="./pages/produtos.html" class="text-amber-800 hover:text-amber-600 transition-colors font-semibold text-lg">Produtos</a>
-                <a href="./pages/carrinho.html" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2">
-                    <span>Carrinho</span>
+            <nav class="flex items-center mt-2 sm:mt-0 space-x-4 sm:space-x-6 text-sm sm:text-base">
+                <a href="./index.html" class="text-amber-800 hover:text-amber-600 transition-colors font-semibold">Produtos</a>
+                <a href="./pages/carrinho.html" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                    <span class="hidden sm:inline">Carrinho</span>
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </a>
             </nav>
         </div>
+        <div class="container mx-auto px-6 mt-4">
+            <input type="text" id="search-bar" placeholder="Pesquisar produtos..." class="w-full p-3 rounded-lg border-2 border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all">
+        </div>
     </header>
 
-    <div class="pt-24">
-        <main class="container mx-auto px-6 py-12 flex flex-col items-center text-center">
-            <h2 class="text-5xl md:text-6xl font-extrabold text-amber-800 mb-6 leading-tight">
-                Delícias te esperam!
+    <div class="pt-40">
+        <main class="container mx-auto px-6 py-12">
+            <h2 class="text-4xl sm:text-5xl md:text-6xl font-extrabold text-amber-800 text-center mb-12">
+                Nossas Delícias
             </h2>
-            <p class="text-xl text-gray-700 max-w-2xl mb-8">
-                Explore nosso cardápio de doces irresistíveis e escolha seus favoritos na aba Produtos.
-            </p>
-            <a href="./pages/produtos.html" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-xl font-bold text-lg transition-all transform hover:scale-105 shadow-lg">
-                Ver Produtos
-            </a>
+            <div id="listaProdutos" class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                </div>
         </main>
     </div>
 
@@ -54,11 +70,90 @@
     </footer>
 
     <script>
+        let todosProdutos = [];
+
         function atualizarContadorCarrinho() {
             const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
             document.getElementById('cart-count').textContent = carrinho.length;
         }
+
+        async function carregarProdutos() {
+            const res = await fetch('/api/produtos');
+            const produtos = await res.json();
+            todosProdutos = produtos;
+            renderizarProdutos(todosProdutos);
+        }
+
+        function renderizarProdutos(produtosParaMostrar) {
+            const lista = document.getElementById('listaProdutos');
+            lista.innerHTML = '';
+            if (produtosParaMostrar.length === 0) {
+                lista.innerHTML = `<p class="text-center text-xl text-gray-500 col-span-full">Nenhum produto encontrado.</p>`;
+            }
+            produtosParaMostrar.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 group';
+                card.innerHTML = `
+                    <div class="relative overflow-hidden">
+                        <img src="${p.imagem_url}" alt="${p.nome}" class="w-full h-36 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500">
+                    </div>
+                    <div class="p-3 sm:p-4 text-center">
+                        <h3 class="text-lg sm:text-2xl font-extrabold text-amber-800 mb-1 sm:mb-2">${p.nome}</h3>
+                        <p class="text-sm sm:text-lg font-semibold text-gray-600 mb-3 sm:mb-4">R$ ${p.preco}</p>
+                        <div class="space-y-2 sm:space-y-3">
+                            <button onclick="adicionarAoCarrinho(${p.id}, '${p.nome}')" class="w-full bg-amber-600 text-white font-bold py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl hover:bg-amber-700 transition-colors shadow-md text-sm">
+                                Adicionar ao Carrinho
+                            </button>
+                            <button onclick="comprarAgora(${p.id})" class="w-full bg-gray-200 text-gray-800 font-bold py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl hover:bg-gray-300 transition-colors text-sm">
+                                Comprar Agora
+                            </button>
+                        </div>
+                    </div>
+                `;
+                lista.appendChild(card);
+            });
+        }
+
+        function filtrarProdutos() {
+            const termoBusca = document.getElementById('search-bar').value.toLowerCase();
+            const produtosFiltrados = todosProdutos.filter(p => p.nome.toLowerCase().includes(termoBusca));
+            renderizarProdutos(produtosFiltrados);
+        }
+        
+        function showAlert(message) {
+            const alertBox = document.getElementById('product-added-alert');
+            const alertMessage = alertBox.querySelector('.ml-3');
+            alertMessage.textContent = message;
+            alertBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                hideAlert();
+            }, 3000); // Esconde o alerta após 3 segundos
+        }
+
+        function hideAlert() {
+            const alertBox = document.getElementById('product-added-alert');
+            alertBox.classList.add('hidden');
+        }
+
+        function adicionarAoCarrinho(idProduto, nomeProduto) {
+            let carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+            carrinho.push(idProduto);
+            localStorage.setItem('carrinho', JSON.stringify(carrinho));
+            localStorage.removeItem('compraDireta');
+            atualizarContadorCarrinho();
+            showAlert(`O produto "${nomeProduto}" foi adicionado ao carrinho!`);
+        }
+
+        function comprarAgora(idProduto) {
+            localStorage.setItem('compraDireta', JSON.stringify([idProduto]));
+            localStorage.removeItem('carrinho');
+            window.location.href = 'carrinho.html';
+        }
+
+        carregarProdutos();
         atualizarContadorCarrinho();
+        document.getElementById('search-bar').addEventListener('input', filtrarProdutos);
     </script>
 </body>
 </html>

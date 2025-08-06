@@ -1,107 +1,266 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Carrinho</title>
-  <link rel="stylesheet" href="../css/carrinho.css">
-</head>
-<body>
-  <header>
-    <h1>Seu Carrinho</h1>
-    <nav>
-      <a href="../index.html">Home</a>
-      <a href="./produtos.html">Produtos</a>
-      <a href="./carrinho.html">Carrinho 🛒 <span id="cart-count">0</span></a>
-    </nav>
-  </header>
-  <main>
-    <div id="listaCarrinho"></div>
-    <p>Total: R$ <span id="totalCarrinho">0.00</span></p>
-    <button onclick="mostrarFormulario()">Finalizar Compra</button>
+    <meta charset="UTF-8" />
+    <title>Carrinho - Minha Confeitaria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
 
-    <div id="formularioCompra" style="display:none;">
-      <h2>Informações para entrega</h2>
-      <form onsubmit="enviarEncomenda(event)">
-        <label>Nome:<input type="text" id="cliente_nome" required></label><br>
-        <label>Email:<input type="email" id="cliente_email" required></label><br>
-        <label>Endereço:<input type="text" id="endereco" required></label><br>
-        <label>Número:<input type="text" id="numero" required></label><br>
-        <label>Forma de pagamento:
-          <select id="forma_pagamento">
-            <option>Pix</option>
-            <option>Dinheiro</option>
-            <option>Cartão</option>
-          </select>
-        </label><br>
-        <button type="submit">Enviar Pedido</button>
-      </form>
-    </div>
-  </main>
-  <footer>
-    <p>&copy; 2025 Minha Confeitaria</p>
-  </footer>
-
-  <script>
-    let idsSelecionados = [];
-
-    function atualizarContadorCarrinho() {
-      const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
-      document.getElementById('cart-count').textContent = carrinho.length;
-    }
-
-    async function carregarCarrinho() {
-      let ids = JSON.parse(localStorage.getItem('compraDireta'));
-      if (!ids || ids.length === 0) {
-        ids = JSON.parse(localStorage.getItem('carrinho') || '[]');
-      }
-      idsSelecionados = ids;
-
-      const produtos = await fetch('/api/produtos').then(res => res.json());
-      const lista = document.getElementById('listaCarrinho');
-      lista.innerHTML = '';
-
-      let total = 0;
-      ids.forEach(id => {
-        const p = produtos.find(prod => prod.id === id);
-        if (p) {
-          const div = document.createElement('div');
-          div.innerHTML = `<h4>${p.nome}</h4><p>R$ ${p.preco}</p>`;
-          lista.appendChild(div);
-          total += parseFloat(p.preco);
+        body {
+            font-family: 'Poppins', sans-serif;
         }
-      });
-      document.getElementById('totalCarrinho').textContent = total.toFixed(2);
-    }
+    </style>
+</head>
 
-    function mostrarFormulario() {
-      document.getElementById('formularioCompra').style.display = 'block';
-    }
+<body class="bg-amber-50 antialiased text-gray-800">
 
-    async function enviarEncomenda(e) {
-      e.preventDefault();
-      const data = {
-        cliente_nome: document.getElementById('cliente_nome').value,
-        cliente_email: document.getElementById('cliente_email').value,
-        endereco: document.getElementById('endereco').value,
-        numero: document.getElementById('numero').value,
-        forma_pagamento: document.getElementById('forma_pagamento').value,
-        produtos: idsSelecionados.map(id => ({ id }))
-      };
+    <div id="alert-message" class="hidden fixed top-0 left-1/2 -translate-x-1/2 mt-4 z-50 w-full max-w-lg mx-auto px-4">
+    </div>
+    <header class="bg-white shadow-md py-4 fixed w-full top-0 z-40">
+        <div
+            class="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                <a href="../index.html" class="flex items-center">
+                    <img src="../assets/Doce_Atelier-logo.png" alt="Logo da Minha Confeitaria" class="h-12 sm:h-16">
+                </a>
+            </h1>
+            <nav class="flex items-center mt-2 sm:mt-0 space-x-4 sm:space-x-6 text-sm sm:text-base">
+                <a href="../index.html"
+                    class="text-amber-800 hover:text-amber-600 transition-colors font-semibold">Produtos</a>
+                <a href="./carrinho.html"
+                    class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                    <span class="hidden sm:inline">Carrinho</span>
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="cart-count"
+                        class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
 
-      await fetch('/api/encomendas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
+    <div class="pt-24">
+        <main class="container mx-auto px-6 py-12">
+            <h2 class="text-5xl font-extrabold text-amber-800 text-center mb-12">
+                Seu Carrinho
+            </h2>
 
-      alert('Pedido enviado!');
-      localStorage.removeItem('carrinho');
-      localStorage.removeItem('compraDireta');
-      window.location.href = '/';
-    }
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div class="bg-white rounded-2xl shadow-xl p-8 flex flex-col h-full">
+                    <h3 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-4">Itens Selecionados</h3>
+                    <div id="listaCarrinho" class="flex-grow space-y-4 mb-6 overflow-y-auto">
+                    </div>
+                    <div class="border-t pt-4 mt-auto">
+                        <div class="flex justify-between items-center text-2xl font-bold text-amber-800">
+                            <span>Total</span>
+                            <span id="totalCarrinho">R$ 0.00</span>
+                        </div>
+                    </div>
 
-    carregarCarrinho();
-    atualizarContadorCarrinho();
-  </script>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
+                        <button onclick="limparCarrinho()"
+                            class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-4 rounded-xl transition-colors shadow-md text-lg">
+                            <i class="fas fa-trash-alt mr-2"></i>Limpar Carrinho
+                        </button>
+                        <button id="finalizarCompraBtn" onclick="mostrarFormulario()"
+                            class="w-full sm:w-auto flex-grow bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 rounded-xl transition-colors shadow-md text-lg">
+                            Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+
+                <div id="formularioCompra" class="bg-white rounded-2xl shadow-xl p-8 hidden">
+                    <h3 class="text-3xl font-bold text-gray-700 mb-6 border-b pb-4">Informações para entrega</h3>
+                    <form onsubmit="enviarEncomenda(event)" class="space-y-6">
+                        <div>
+                            <label for="cliente_nome" class="block text-lg font-medium text-gray-700 mb-1">Nome:</label>
+                            <input type="text" id="cliente_nome" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-colors">
+                        </div>
+                        <div>
+                            <label for="cliente_email"
+                                class="block text-lg font-medium text-gray-700 mb-1">Email:</label>
+                            <input type="email" id="cliente_email" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-colors">
+                        </div>
+                        <div>
+                            <label for="endereco" class="block text-lg font-medium text-gray-700 mb-1">Endereço:</label>
+                            <input type="text" id="endereco" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-colors">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="numero" class="block text-lg font-medium text-gray-700 mb-1">Número:</label>
+                                <input type="text" id="numero" required
+                                    class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-colors">
+                            </div>
+                            <div>
+                                <label for="forma_pagamento"
+                                    class="block text-lg font-medium text-gray-700 mb-1">Pagamento:</label>
+                                <select id="forma_pagamento"
+                                    class="w-full bg-gray-100 border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-amber-500 transition-colors">
+                                    <option>Pix</option>
+                                    <option>Dinheiro</option>
+                                    <option>Cartão</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-4 rounded-xl transition-colors shadow-md text-lg mt-6">
+                            Enviar Pedido
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-amber-900 text-white py-8 mt-auto">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Minha Confeitaria</p>
+        </div>
+    </footer>
+
+    <script>
+        let idsSelecionados = [];
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alert-message');
+            let colorClasses = '';
+            let iconPath = '';
+
+            if (type === 'success') {
+                colorClasses = 'text-green-800 border-green-300 bg-green-50';
+                iconPath = `<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm9.5 9.5h-10a1 1 0 0 1 0-2h10a1 1 0 0 1 0 2Z"/>`;
+            } else if (type === 'error') {
+                colorClasses = 'text-red-800 border-red-300 bg-red-50';
+                iconPath = `<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4H9a1 1 0 0 1 0-2h2a1 1 0 1 1 0 2Z"/>`;
+            }
+
+            alertBox.innerHTML = `
+                <div class="flex items-center p-4 rounded-xl border-t-4 shadow-lg ${colorClasses}" role="alert">
+                    <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        ${iconPath}
+                    </svg>
+                    <div class="ml-3 text-sm font-medium">
+                        ${message}
+                    </div>
+                    <button type="button" onclick="hideAlert()" class="ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg focus:ring-2 inline-flex items-center justify-center h-8 w-8">
+                        <span class="sr-only">Fechar</span>
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            alertBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                hideAlert();
+            }, 3000);
+        }
+
+        function hideAlert() {
+            document.getElementById('alert-message').classList.add('hidden');
+        }
+
+        function atualizarContadorCarrinho() {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+            document.getElementById('cart-count').textContent = carrinho.length;
+        }
+
+        async function carregarCarrinho() {
+            let ids = JSON.parse(localStorage.getItem('carrinho') || '[]');
+
+            if (ids.length === 0) {
+                ids = JSON.parse(localStorage.getItem('compraDireta') || '[]');
+            }
+
+            idsSelecionados = ids;
+
+            const produtos = await fetch('/api/produtos').then(res => res.json());
+            const lista = document.getElementById('listaCarrinho');
+            lista.innerHTML = '';
+
+            let total = 0;
+            const finalizarCompraBtn = document.getElementById('finalizarCompraBtn');
+
+            if (ids.length === 0) {
+                lista.innerHTML = `<p class="text-center text-gray-500">Seu carrinho está vazio.</p>`;
+                finalizarCompraBtn.disabled = true;
+            } else {
+                finalizarCompraBtn.disabled = false;
+
+                ids.forEach(id => {
+                    const p = produtos.find(prod => prod.id === id);
+                    if (p) {
+                        const div = document.createElement('div');
+                        div.className = 'flex justify-between items-center p-4 rounded-lg bg-gray-100';
+                        div.innerHTML = `
+                            <div class="font-semibold">${p.nome}</div>
+                            <div class="text-amber-700">R$ ${p.preco}</div>
+                        `;
+                        lista.appendChild(div);
+                        total += parseFloat(p.preco);
+                    }
+                });
+            }
+
+            document.getElementById('totalCarrinho').textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        function mostrarFormulario() {
+            document.getElementById('formularioCompra').classList.remove('hidden');
+        }
+
+        async function enviarEncomenda(e) {
+            e.preventDefault();
+            const data = {
+                cliente_nome: document.getElementById('cliente_nome').value,
+                cliente_email: document.getElementById('cliente_email').value,
+                endereco: document.getElementById('endereco').value,
+                numero: document.getElementById('numero').value,
+                forma_pagamento: document.getElementById('forma_pagamento').value,
+                produtos: idsSelecionados.map(id => ({ id }))
+            };
+
+            try {
+                const res = await fetch('/api/encomendas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    showAlert('Pedido enviado com sucesso! Obrigado pela sua compra.', 'success');
+                    localStorage.removeItem('carrinho');
+                    localStorage.removeItem('compraDireta');
+
+                    setTimeout(() => {
+                        window.location.href = '../index.html';
+                    }, 3000);
+
+                } else {
+                    throw new Error('Erro ao enviar pedido.');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar pedido:', error);
+                showAlert('Ocorreu um erro ao enviar seu pedido. Por favor, tente novamente.', 'error');
+            }
+        }
+
+        function limparCarrinho() {
+            localStorage.removeItem('carrinho');
+            localStorage.removeItem('compraDireta');
+            window.location.reload();
+        }
+
+        carregarCarrinho();
+        atualizarContadorCarrinho();
+    </script>
 </body>
+
 </html>
