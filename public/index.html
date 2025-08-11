@@ -84,35 +84,35 @@
             renderizarProdutos(todosProdutos);
         }
 
-        function renderizarProdutos(produtosParaMostrar) {
-            const lista = document.getElementById('listaProdutos');
-            lista.innerHTML = '';
-            if (produtosParaMostrar.length === 0) {
-                lista.innerHTML = `<p class="text-center text-xl text-gray-500 col-span-full">Nenhum produto encontrado.</p>`;
-            }
-            produtosParaMostrar.forEach(p => {
-                const card = document.createElement('div');
-                card.className = 'bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 group';
-                card.innerHTML = `
-                    <div class="relative overflow-hidden">
-                        <img src="${p.imagem_url}" alt="${p.nome}" class="w-full h-36 sm:h-48 object-cover group-hover:scale-110 transition-transform duration-500">
-                    </div>
-                    <div class="p-3 sm:p-4 text-center">
-                        <h3 class="text-lg sm:text-2xl font-extrabold text-amber-800 mb-1 sm:mb-2">${p.nome}</h3>
-                        <p class="text-sm sm:text-lg font-semibold text-gray-600 mb-3 sm:mb-4">R$ ${p.preco}</p>
-                        <div class="space-y-2 sm:space-y-3">
-                            <button onclick="adicionarAoCarrinho(${p.id}, '${p.nome}')" class="w-full bg-amber-600 text-white font-bold py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl hover:bg-amber-700 transition-colors shadow-md text-sm">
-                                Adicionar ao Carrinho
-                            </button>
-                            <button onclick="comprarAgora(${p.id})" class="w-full bg-gray-200 text-gray-800 font-bold py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl hover:bg-gray-300 transition-colors text-sm">
-                                Comprar Agora
-                            </button>
-                        </div>
-                    </div>
-                `;
-                lista.appendChild(card);
-            });
-        }
+       function renderizarProdutos(produtosParaMostrar) {
+    const lista = document.getElementById('listaProdutos');
+    lista.innerHTML = '';
+    if (produtosParaMostrar.length === 0) {
+        lista.innerHTML = `<p class="text-center text-xl text-gray-500 col-span-full">Nenhum produto encontrado.</p>`;
+    }
+    produtosParaMostrar.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-2xl shadow-xl overflow-hidden transform hover:scale-105 transition-all duration-300 group';
+        card.innerHTML = `
+            <div class="relative overflow-hidden">
+                <img src="${p.imagem_url}" alt="${p.nome}" class="w-full h-32 sm:h-40 object-cover group-hover:scale-110 transition-transform duration-500">
+            </div>
+            <div class="p-3 text-center">
+                <h3 class="text-lg sm:text-xl font-extrabold text-amber-800 mb-1">${p.nome}</h3>
+                <p class="text-sm font-semibold text-gray-600 mb-2">R$ ${p.preco}</p>
+                <div class="space-y-2">
+                    <button onclick="adicionarAoCarrinho(${p.id}, '${p.nome}')" class="w-full bg-amber-600 text-white font-bold py-2 px-3 rounded-xl hover:bg-amber-700 transition-colors shadow-md text-sm">
+                        Adicionar ao Carrinho
+                    </button>
+                    <button onclick="comprarAgora(${p.id})" class="w-full bg-gray-200 text-gray-800 font-bold py-2 px-3 rounded-xl hover:bg-gray-300 transition-colors text-sm">
+                        Comprar Agora
+                    </button>
+                </div>
+            </div>
+        `;
+        lista.appendChild(card);
+    });
+}
 
         function filtrarProdutos() {
             const termoBusca = document.getElementById('search-bar').value.toLowerCase();
@@ -148,7 +148,7 @@
         function comprarAgora(idProduto) {
             localStorage.setItem('compraDireta', JSON.stringify([idProduto]));
             localStorage.removeItem('carrinho');
-            window.location.href = 'carrinho.html';
+            window.location.href = './pages/carrinho.html';
         }
 
         carregarProdutos();
