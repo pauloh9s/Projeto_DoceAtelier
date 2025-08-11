@@ -94,11 +94,27 @@ app.post('/api/login', async (req, res) => {
 
 // Separar em outro arquivo (   RouteProdutos.js   )
 // CRUD Produtos
+//Rota para clientes
 app.get('/api/produtos', async (req, res) => {
-    const { rows } = await pool.query('SELECT * FROM produtos');
-    res.json(rows);
+    try {
+        const { rows } = await pool.query('SELECT * FROM produtos WHERE disponivel = TRUE');
+        res.json(rows);
+    } catch (error) {
+        console.error('Erro ao buscar produtos para o cliente:', error);
+        res.status(500).json({ error: 'Erro ao buscar produtos' });
+    }
 });
 
+// Rota protegida para o Dashboard - Retorna TODOS os produtos
+app.get('/api/admin/produtos', authenticateToken, async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM produtos');
+        res.json(rows);
+    } catch (error) {
+        console.error('Erro ao buscar produtos para o admin:', error);
+        res.status(500).json({ error: 'Erro ao buscar produtos' });
+    }
+});
 // Adiciona novo Produto
 app.post('/api/produtos', authenticateToken, upload.single('imagem'), async (req, res) => {
     console.log('Arquivo recebido:', req.file); // Verifica o arquivo enviado
@@ -176,6 +192,24 @@ app.delete('/api/produtos/:id', authenticateToken, async (req, res) => {
     } catch (error) {
         console.error('Erro ao deletar produto:', error);
         res.status(500).json({ erro: 'Erro ao deletar produto' });
+    }
+});
+
+// Alterar a disponibilidade do produto
+app.put('/api/produtos/:id/disponibilidade', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { disponivel } = req.body;
+        
+        await pool.query(
+            "UPDATE produtos SET disponivel = $1 WHERE id = $2",
+            [disponivel, id]
+        );
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error('Erro ao atualizar a disponibilidade:', err.message);
+        res.status(500).send("Erro no servidor");
     }
 });
 

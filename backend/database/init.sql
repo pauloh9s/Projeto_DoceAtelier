@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS produtos (
   preco NUMERIC(10,2) NOT NULL,
   imagem_url TEXT,
   descricao VARCHAR(255),
+  disponivel BOOLEAN DEFAULT TRUE,
   nome_categoria TEXT,
   FOREIGN KEY (nome_categoria) REFERENCES categorias(nome)
 );
