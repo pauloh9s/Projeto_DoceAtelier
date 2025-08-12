@@ -21,18 +21,22 @@
     <div id="alert-message" class="hidden fixed top-0 left-1/2 -translate-x-1/2 mt-4 z-50 w-full max-w-lg mx-auto px-4">
     </div>
     <header class="bg-white shadow-md py-4 fixed w-full top-0 z-40">
-        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+        <div
+            class="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
             <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
                 <a href="../index.html" class="flex items-center">
                     <img src="../assets/Doce_Atelier-logo.png" alt="Logo da Minha Confeitaria" class="h-12 sm:h-16">
                 </a>
             </h1>
             <nav class="flex items-center mt-2 sm:mt-0 space-x-4 sm:space-x-6 text-sm sm:text-base">
-                <a href="../index.html" class="text-amber-800 hover:text-amber-600 transition-colors font-semibold">Produtos</a>
-                <a href="./carrinho.html" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                <a href="../index.html"
+                    class="text-amber-800 hover:text-amber-600 transition-colors font-semibold">Produtos</a>
+                <a href="./carrinho.html"
+                    class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2">
                     <span class="hidden sm:inline">Carrinho</span>
                     <i class="fa-solid fa-cart-shopping"></i>
-                    <span id="cart-count" class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                    <span id="cart-count"
+                        class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
                 </a>
             </nav>
         </div>
@@ -46,7 +50,8 @@
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">
                 <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col h-full">
-                    <h3 class="text-xl sm:text-2xl font-bold text-gray-700 mb-4 sm:mb-6 border-b pb-4">Itens Selecionados</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold text-gray-700 mb-4 sm:mb-6 border-b pb-4">Itens
+                        Selecionados</h3>
                     <div id="listaCarrinho" class="flex-grow space-y-3 sm:space-y-4 mb-4 sm:mb-6 overflow-y-auto">
                     </div>
                     <div class="border-t pt-4 mt-auto">
@@ -57,45 +62,59 @@
                     </div>
 
                     <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
-                        <button onclick="limparCarrinho()" class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-base">
+                        <button onclick="limparCarrinho()"
+                            class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-base">
                             <i class="fas fa-trash-alt mr-2"></i>Limpar Carrinho
                         </button>
-                        <button id="finalizarCompraBtn" onclick="mostrarFormulario()" class="w-full sm:w-auto flex-grow bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-base">
+                        <button id="finalizarCompraBtn" onclick="mostrarFormulario()"
+                            class="w-full sm:w-auto flex-grow bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-base">
                             Finalizar Compra
                         </button>
                     </div>
                 </div>
 
                 <div id="formularioCompra" class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 hidden">
-                    <h3 class="text-xl sm:text-2xl font-bold text-gray-700 mb-4 sm:mb-6 border-b pb-4">Informações para entrega</h3>
+                    <h3 class="text-xl sm:text-2xl font-bold text-gray-700 mb-4 sm:mb-6 border-b pb-4">Informações para
+                        entrega</h3>
                     <form onsubmit="enviarEncomenda(event)" class="space-y-4">
                         <div>
-                            <label for="cliente_nome" class="block text-base font-medium text-gray-700 mb-1">Nome:</label>
-                            <input type="text" id="cliente_nome" required class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
+                            <label for="cliente_nome"
+                                class="block text-base font-medium text-gray-700 mb-1">Nome:</label>
+                            <input type="text" id="cliente_nome" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
                         </div>
                         <div>
-                            <label for="cliente_email" class="block text-base font-medium text-gray-700 mb-1">Email:</label>
-                            <input type="email" id="cliente_email" required class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
+                            <label for="cliente_email"
+                                class="block text-base font-medium text-gray-700 mb-1">Email:</label>
+                            <input type="email" id="cliente_email" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
                         </div>
                         <div>
-                            <label for="endereco" class="block text-base font-medium text-gray-700 mb-1">Endereço:</label>
-                            <input type="text" id="endereco" required class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
+                            <label for="endereco"
+                                class="block text-base font-medium text-gray-700 mb-1">Endereço:</label>
+                            <input type="text" id="endereco" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <label for="numero" class="block text-base font-medium text-gray-700 mb-1">Número:</label>
-                                <input type="text" id="numero" required class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
+                                <label for="numero"
+                                    class="block text-base font-medium text-gray-700 mb-1">Número:</label>
+                                <input type="text" id="numero" required
+                                    class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
                             </div>
                             <div>
-                                <label for="forma_pagamento" class="block text-base font-medium text-gray-700 mb-1">Pagamento:</label>
-                                <select id="forma_pagamento" class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
+                                <label for="forma_pagamento"
+                                    class="block text-base font-medium text-gray-700 mb-1">Pagamento:</label>
+                                <select id="forma_pagamento"
+                                    class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors">
                                     <option>Pix</option>
                                     <option>Dinheiro</option>
                                     <option>Cartão</option>
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-base mt-4">
+                        <button type="submit"
+                            class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-base mt-4">
                             Enviar Pedido
                         </button>
                     </form>
@@ -170,7 +189,7 @@
             idsComDuplicatas.forEach(id => {
                 carrinhoAgrupado[id] = (carrinhoAgrupado[id] || 0) + 1;
             });
-            
+
             idsSelecionados = Object.keys(carrinhoAgrupado).map(id => ({
                 id: parseInt(id),
                 quantidade: carrinhoAgrupado[id]
@@ -189,34 +208,50 @@
             } else {
                 finalizarCompraBtn.disabled = false;
 
-                idsSelecionados.forEach(item => {
-                    const p = produtos.find(prod => prod.id === item.id);
-                    if (p) {
-                        const subtotal = p.preco * item.quantidade;
-                        const div = document.createElement('div');
-                        div.className = 'flex items-center justify-between p-3 rounded-lg bg-gray-100 text-sm';
-                        div.innerHTML = `
-                            <div class="font-semibold flex-1">${p.nome}</div>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="diminuirQuantidade(${item.id})" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded-lg">-</button>
-                                <span class="w-6 text-center font-bold">${item.quantidade}</span>
-                                <button onclick="aumentarQuantidade(${item.id})" class="text-green-500 hover:text-green-700 font-bold px-2 py-1 rounded-lg">+</button>
-                            </div>
-                            <div class="w-24 text-right font-semibold text-amber-700">R$ ${subtotal.toFixed(2)}</div>
-                        `;
-                        lista.appendChild(div);
-                        total += subtotal;
+                // Criar um novo array com os detalhes completos dos produtos
+                const produtosCompletos = idsSelecionados.map(item => {
+                    const produtoCompleto = produtos.find(prod => prod.id === item.id);
+                    if (produtoCompleto) {
+                        return {
+                            id: produtoCompleto.id,
+                            nome: produtoCompleto.nome,
+                            preco: produtoCompleto.preco,
+                            imagem_url: produtoCompleto.imagem_url,
+                            quantidade: item.quantidade
+                        };
                     }
+                    return null;
+                }).filter(p => p !== null); // Filtra produtos que não foram encontrados
+
+                // Substituir a variável global idsSelecionados por este novo array
+                idsSelecionados = produtosCompletos;
+
+                // Iterar sobre o novo array para renderizar a lista
+                idsSelecionados.forEach(item => {
+                    const subtotal = item.preco * item.quantidade;
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 rounded-lg bg-gray-100 text-sm';
+                    div.innerHTML = `
+            <div class="font-semibold flex-1">${item.nome}</div>
+            <div class="flex items-center space-x-2">
+                <button onclick="diminuirQuantidade(${item.id})" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded-lg">-</button>
+                <span class="w-6 text-center font-bold">${item.quantidade}</span>
+                <button onclick="aumentarQuantidade(${item.id})" class="text-green-500 hover:text-green-700 font-bold px-2 py-1 rounded-lg">+</button>
+            </div>
+            <div class="w-24 text-right font-semibold text-amber-700">R$ ${subtotal.toFixed(2)}</div>
+        `;
+                    lista.appendChild(div);
+                    total += subtotal;
                 });
             }
 
             document.getElementById('totalCarrinho').textContent = `R$ ${total.toFixed(2)}`;
         }
-        
+
         // Função para atualizar o localStorage com a nova estrutura
-        function salvarCarrinho(carrinhoAgrupado) {
+        function salvarCarrinho() {
             let novoCarrinho = [];
-            carrinhoAgrupado.forEach(item => {
+            idsSelecionados.forEach(item => {
                 for (let i = 0; i < item.quantidade; i++) {
                     novoCarrinho.push(item.id);
                 }
@@ -224,7 +259,6 @@
             localStorage.setItem('carrinho', JSON.stringify(novoCarrinho));
             localStorage.removeItem('compraDireta'); // Garante que a compra direta seja limpa
         }
-
         // Função para aumentar a quantidade de um produto
         function aumentarQuantidade(id) {
             const item = idsSelecionados.find(p => p.id === id);
@@ -258,18 +292,24 @@
 
         async function enviarEncomenda(e) {
             e.preventDefault();
+            const agora = new Date();
+            const produtosDetalhes = idsSelecionados.map(item => ({
+                id: item.id,
+                quantidade: item.quantidade,
+                // Inclua outros detalhes importantes do produto se disponíveis no front-end
+                nome: item.nome,
+                preco: item.preco,
+                imagem_url: item.imagem_url
+            }));
+
             const data = {
                 cliente_nome: document.getElementById('cliente_nome').value,
                 cliente_email: document.getElementById('cliente_email').value,
                 endereco: document.getElementById('endereco').value,
                 numero: document.getElementById('numero').value,
                 forma_pagamento: document.getElementById('forma_pagamento').value,
-                produtos: idsSelecionados.reduce((acc, item) => {
-                    for (let i = 0; i < item.quantidade; i++) {
-                        acc.push({ id: item.id });
-                    }
-                    return acc;
-                }, [])
+                data_encomenda: agora.toISOString(), // Adiciona a data atual
+                produtos: produtosDetalhes // Envia um array de objetos completos
             };
 
             try {
@@ -283,11 +323,9 @@
                     showAlert('Pedido enviado com sucesso! Obrigado pela sua compra.', 'success');
                     localStorage.removeItem('carrinho');
                     localStorage.removeItem('compraDireta');
-
                     setTimeout(() => {
                         window.location.href = '../index.html';
                     }, 3000);
-
                 } else {
                     throw new Error('Erro ao enviar pedido.');
                 }

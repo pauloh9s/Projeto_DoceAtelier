@@ -94,11 +94,27 @@ app.post('/api/login', async (req, res) => {
 
 // Separar em outro arquivo (   RouteProdutos.js   )
 // CRUD Produtos
+//Rota para clientes
 app.get('/api/produtos', async (req, res) => {
-    const { rows } = await pool.query('SELECT * FROM produtos');
-    res.json(rows);
+    try {
+        const { rows } = await pool.query('SELECT * FROM produtos WHERE disponivel = TRUE');
+        res.json(rows);
+    } catch (error) {
+        console.error('Erro ao buscar produtos para o cliente:', error);
+        res.status(500).json({ error: 'Erro ao buscar produtos' });
+    }
 });
 
+// Rota protegida para o Dashboard - Retorna TODOS os produtos
+app.get('/api/admin/produtos', authenticateToken, async (req, res) => {
+    try {
+        const { rows } = await pool.query('SELECT * FROM produtos');
+        res.json(rows);
+    } catch (error) {
+        console.error('Erro ao buscar produtos para o admin:', error);
+        res.status(500).json({ error: 'Erro ao buscar produtos' });
+    }
+});
 // Adiciona novo Produto
 app.post('/api/produtos', authenticateToken, upload.single('imagem'), async (req, res) => {
     console.log('Arquivo recebido:', req.file); // Verifica o arquivo enviado
@@ -179,45 +195,131 @@ app.delete('/api/produtos/:id', authenticateToken, async (req, res) => {
     }
 });
 
+// Alterar a disponibilidade do produto
+app.put('/api/produtos/:id/disponibilidade', authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { disponivel } = req.body;
+        
+        await pool.query(
+            "UPDATE produtos SET disponivel = $1 WHERE id = $2",
+            [disponivel, id]
+        );
+
+        res.sendStatus(200);
+    } catch (err) {
+        console.error('Erro ao atualizar a disponibilidade:', err.message);
+        res.status(500).send("Erro no servidor");
+    }
+});
+
 // Encomendas
 // Separar RouteEncomenda.js
 // Cria nova Encomenda
 app.post('/api/encomendas', async (req, res) => {
-    const { cliente_nome, cliente_email, endereco, numero, forma_pagamento, produtos } = req.body;
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN'); // Inicia uma transação
 
-    const result = await pool.query(
-        'INSERT INTO encomendas (cliente_nome, cliente_email, endereco, numero, forma_pagamento) VALUES ($1, $2, $3, $4, $5) RETURNING id',
-        [cliente_nome, cliente_email, endereco, numero, forma_pagamento]
-    );
-    const encomendaId = result.rows[0].id;
-    //Adiciona os produtos selecionados para dentro da encomenda
-    for (let p of produtos) {
-        await pool.query(
-            'INSERT INTO encomenda_produtos (encomenda_id, produto_id) VALUES ($1, $2)',
-            [encomendaId, p.id]
+        const { cliente_nome, cliente_email, endereco, numero, forma_pagamento, produtos, data_encomenda } = req.body;
+
+        // 1. Inserir a nova encomenda na tabela 'encomendas'
+        const encomendaRes = await client.query(
+            `INSERT INTO encomendas (cliente_nome, cliente_email, endereco, numero, forma_pagamento, status_encomenda, data_encomenda)
+             VALUES ($1, $2, $3, $4, $5, $6, $7)
+             RETURNING id`,
+            [cliente_nome, cliente_email, endereco, numero, forma_pagamento, 'Aceitar', data_encomenda]
         );
+        const encomendaId = encomendaRes.rows[0].id;
+
+        // 2. Iterar sobre a lista de produtos para inserir na tabela 'encomenda_produtos'
+        for (const produto of produtos) {
+            // O seu frontend já envia um objeto com 'id', 'quantidade' e 'preco'
+            const { id, quantidade, preco } = produto;
+
+            // 3. Inserir na tabela 'encomenda_produtos'
+            await client.query(
+                `INSERT INTO encomenda_produtos (encomenda_id, produto_id, quantidade, preco_unitario)
+                 VALUES ($1, $2, $3, $4)`,
+                [encomendaId, id, quantidade, preco] // Correção: Passa a variável 'preco' para a query
+            );
+        }
+
+        await client.query('COMMIT'); // Finaliza a transação
+        res.status(201).json({ mensagem: 'Encomenda criada com sucesso!', encomendaId });
+    } catch (error) {
+        await client.query('ROLLBACK'); // Desfaz a transação em caso de erro
+        console.error('Erro ao criar encomenda:', error);
+        res.status(500).json({ mensagem: 'Erro interno do servidor.' });
+    } finally {
+        client.release();
     }
-    res.sendStatus(201);
 });
+
 // Seleciona a lista de encomendas
-app.get('/api/encomendas', authenticateToken, async (req, res) => {
-    const encomendasRes = await pool.query('SELECT * FROM encomendas');
-    const encomendas = await Promise.all(encomendasRes.rows.map(async (e) => {
-        const produtosRes = await pool.query(
-            `SELECT p.* FROM produtos p
-        JOIN encomenda_produtos ep ON ep.produto_id = p.id
-        WHERE ep.encomenda_id = $1`,
-            [e.id]
-        );
-        return { ...e, produtos: produtosRes.rows };
-    }));
-    res.json(encomendas);
+app.get('/api/encomendas', async (req, res) => {
+    const client = await pool.connect();
+    try {
+        // Query para obter todas as encomendas
+        const encomendasQuery = await client.query('SELECT * FROM encomendas ORDER BY id DESC');
+        const encomendas = encomendasQuery.rows;
+
+        // Para cada encomenda, buscar os produtos associados
+        for (const encomenda of encomendas) {
+            const produtosQuery = await client.query(
+                `SELECT ep.quantidade, ep.preco_unitario, p.nome AS nome_produto, p.imagem_url 
+                 FROM encomenda_produtos ep
+                 JOIN produtos p ON ep.produto_id = p.id
+                 WHERE ep.encomenda_id = $1`,
+                [encomenda.id]
+            );
+            encomenda.produtos = produtosQuery.rows;
+        }
+
+        res.json(encomendas);
+    } catch (error) {
+        console.error('Erro ao buscar encomendas:', error);
+        res.status(500).json({ mensagem: 'Erro interno do servidor.' });
+    } finally {
+        client.release();
+    }
 });
 // Deleta a encomenda
 app.delete('/api/encomendas/:id', authenticateToken, async (req, res) => {
     await pool.query('DELETE FROM encomendas WHERE id = $1', [req.params.id]);
     res.sendStatus(200);
 });
+
+app.patch('/api/encomendas/:id/status', async (req, res) => {
+    const { id } = req.params;
+    const { status_encomenda } = req.body;
+
+    // Adicione uma verificação de segurança para garantir que o status é válido
+    const statusValidos = ['Aceitar', 'Em Produção', 'Saiu para entrega', 'Entregue'];
+    if (!statusValidos.includes(status_encomenda)) {
+        return res.status(400).json({ mensagem: 'Status de encomenda inválido.' });
+    }
+
+    const client = await pool.connect();
+    try {
+        const result = await client.query(
+            'UPDATE encomendas SET status_encomenda = $1 WHERE id = $2 RETURNING *',
+            [status_encomenda, id]
+        );
+
+        if (result.rows.length > 0) {
+            res.json(result.rows[0]);
+        } else {
+            res.status(404).json({ mensagem: 'Encomenda não encontrada.' });
+        }
+    } catch (error) {
+        console.error('Erro ao atualizar status da encomenda:', error);
+        res.status(500).json({ mensagem: 'Erro interno do servidor.' });
+    } finally {
+        client.release();
+    }
+});
+
 // --- Rotas para o CRUD de Categorias ---
 
 // Rota GET para listar todas as categorias (Pública)
