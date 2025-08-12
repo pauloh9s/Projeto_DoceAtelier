@@ -106,14 +106,26 @@
         </div>
       </div>
 
-      <div id="encomendas-content" class="tab-content">
-        <h2 class="text-4xl font-extrabold text-amber-800 mb-8 text-center">Gerenciar Encomendas</h2>
-        <div class="mt-8">
-          <h3 class="text-3xl font-bold text-amber-800 mb-6">Encomendas Recebidas</h3>
-          <div id="listaEncomendas" class="flex flex-col gap-4">
-          </div>
+     <div id="encomendas-content" class="tab-content">
+    <h2 class="text-4xl font-extrabold text-amber-800 mb-8 text-center">Gerenciar Encomendas</h2>
+    <div class="mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div id="encomendas-aceitar" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                <h3 class="text-2xl font-bold mb-4 text-gray-700">Aguardando Aceitação</h3>
+                </div>
+
+            <div id="encomendas-producao" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                <h3 class="text-2xl font-bold mb-4 text-gray-700">Em Produção</h3>
+                </div>
+
+            <div id="encomendas-entrega" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+                <h3 class="text-2xl font-bold mb-4 text-gray-700">Para Entrega</h3>
+                </div>
+
         </div>
-      </div>
+    </div>
+</div>
     </main>
   </div>
 
@@ -647,36 +659,43 @@
 
     // --- Novas Funções de Encomendas ---
     async function carregarEncomendas() {
-      const token = localStorage.getItem('token');
-      try {
+    const token = localStorage.getItem('token');
+    try {
         const response = await fetch('/api/encomendas', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
         });
         if (!response.ok) throw new Error('Falha ao carregar encomendas');
         const encomendas = await response.json();
-        const lista = document.getElementById('listaEncomendas');
-        lista.innerHTML = '';
+
+        // Limpa todos os contêineres antes de recarregar
+        document.getElementById('encomendas-aceitar').innerHTML = '<h2 class="text-2xl font-bold mb-4">Aceitar</h2>';
+        document.getElementById('encomendas-producao').innerHTML = '<h2 class="text-2xl font-bold mb-4">Em Produção</h2>';
+        document.getElementById('encomendas-entrega').innerHTML = '<h2 class="text-2xl font-bold mb-4">Para Entrega</h2>';
 
         if (encomendas.length === 0) {
-          lista.innerHTML = '<p class="text-center text-gray-500">Nenhuma encomenda encontrada.</p>';
-          return;
+            // Pode adicionar uma mensagem para cada card se preferir
+            return;
         }
 
         encomendas.forEach(encomenda => {
-          // Calcular o valor total da encomenda
-          const valorTotal = encomenda.produtos.reduce((total, p) => {
-            // Certifica-se de que quantidade e preco_unitario são números
-            const quantidade = p.quantidade ? parseFloat(p.quantidade) : 0;
-            const preco = p.preco_unitario ? parseFloat(p.preco_unitario) : 0;
-            return total + (quantidade * preco);
-          }, 0);
+            // Ignora encomendas com status "Entregue" para não exibir na dashboard
+            if (encomenda.status_encomenda === 'Entregue') {
+                return;
+            }
 
-          // Mapeia os produtos para gerar a lista de itens HTML
-          const produtosHTML = encomenda.produtos.map(p => {
-            const precoFormatado = p.preco_unitario ? parseFloat(p.preco_unitario).toFixed(2) : '0.00';
-            return `
+            // Calcular o valor total da encomenda
+            const valorTotal = encomenda.produtos.reduce((total, p) => {
+                const quantidade = p.quantidade ? parseFloat(p.quantidade) : 0;
+                const preco = p.preco_unitario ? parseFloat(p.preco_unitario) : 0;
+                return total + (quantidade * preco);
+            }, 0);
+
+            // Mapeia os produtos para gerar a lista de itens HTML
+            const produtosHTML = encomenda.produtos.map(p => {
+                const precoFormatado = p.preco_unitario ? parseFloat(p.preco_unitario).toFixed(2) : '0.00';
+                return `
                     <div class="flex items-center space-x-3 bg-amber-50 p-3 rounded-lg shadow-sm">
                         <img src="${p.imagem_url}" alt="${p.nome_produto}" class="w-12 h-12 object-cover rounded-md">
                         <div class="flex-grow">
@@ -685,139 +704,58 @@
                         <p class="text-sm font-bold text-amber-700">R$ ${precoFormatado}</p>
                     </div>
                 `;
-          }).join('');
+            }).join('');
 
-          // Lógica para determinar o status e gerar o stepper
-          // CORRIGIDO: Usar a propriedade status_encomenda
-          const statusPedido = encomenda.status_encomenda || 'Aceitar';
-          const statusMap = {
-            'Aceitar': {
-              step1: 'active',
-              step2: 'default',
-              step3: 'default',
-              step1Title: 'Aceitar',
-              step1Detail: 'Aguardando aceitação',
-              actionBtn: `<button onclick="avancarStatus(${encomenda.id}, 'Em Produção')" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors">Aceitar Pedido</button>`
-            },
-            'Em Produção': {
-              step1: 'completed',
-              step2: 'active',
-              step3: 'default',
-              step1Title: 'Aceito',
-              step1Detail: 'Pedido aceito',
-              step2Title: 'Em Produção',
-              step2Detail: 'Preparando o pedido',
-              actionBtn: `<button onclick="avancarStatus(${encomenda.id}, 'Saiu para entrega')" class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors">Marcar como "Saiu para entrega"</button>`
-            },
-            'Saiu para entrega': {
-              step1: 'completed',
-              step2: 'completed',
-              step3: 'active',
-              step1Title: 'Aceito',
-              step1Detail: 'Pedido aceito',
-              step2Title: 'Em Produção',
-              step2Detail: 'Preparando o pedido',
-              step3Title: 'Saiu para entrega',
-              step3Detail: 'A caminho do cliente',
-              actionBtn: `<p class="mt-4 text-green-600 font-bold">Entrega em andamento.</p>`
-            },
-            'Entregue': {
-              step1: 'completed',
-              step2: 'completed',
-              step3: 'completed',
-              step1Title: 'Aceito',
-              step1Detail: 'Pedido aceito',
-              step2Title: 'Em Produção',
-              step2Detail: 'Preparando o pedido',
-              step3Title: 'Entregue',
-              step3Detail: 'Pedido finalizado',
-              actionBtn: `<p class="mt-4 text-green-600 font-bold">Pedido entregue.</p>`
-            },
-          };
+            const div = document.createElement('div');
+            div.className = 'bg-white p-6 shadow-lg rounded-xl product-list-item mb-4';
 
-          const statusAtual = statusMap[statusPedido] || statusMap['Aceitar'];
-
-          const getStepClasses = (stepState) => {
-            if (stepState === 'active') {
-              return 'flex items-center text-blue-600 dark:text-blue-500 space-x-2.5 rtl:space-x-reverse';
-            } else if (stepState === 'completed') {
-              return 'flex items-center text-green-600 dark:text-green-500 space-x-2.5 rtl:space-x-reverse';
+            // Lógica do botão de ação
+            let actionBtn = '';
+            if (encomenda.status_encomenda === 'Aceitar') {
+                actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Em Produção')" class="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors">Aceitar Pedido</button>`;
+            } else if (encomenda.status_encomenda === 'Em Produção') {
+                actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Saiu para entrega')" class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors">Marcar como "Saiu para entrega"</button>`;
+            } else if (encomenda.status_encomenda === 'Saiu para entrega') {
+                // Novo botão "Finalizar" para a última etapa
+                actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Entregue')" class="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors">Finalizar Pedido</button>`;
             }
-            return 'flex items-center text-gray-500 dark:text-gray-400 space-x-2.5 rtl:space-x-reverse';
-          };
 
-          const getStepMarker = (stepState, stepNumber) => {
-            if (stepState === 'completed') {
-              return `<span class="flex items-center justify-center w-8 h-8 border border-green-600 rounded-full shrink-0 dark:border-green-500">✓</span>`;
-            }
-            return `<span class="flex items-center justify-center w-8 h-8 border border-gray-500 rounded-full shrink-0 dark:border-gray-400">
-                            ${stepNumber}
-                        </span>`;
-          };
-
-          const stepperHTML = `
-                <ol class="flex items-center w-full space-x-8">
-                    <li class="${getStepClasses(statusAtual.step1)}">
-                        ${getStepMarker(statusAtual.step1, 1)}
-                        <span>
-                            <h3 class="font-medium leading-tight">${statusAtual.step1Title || 'Aceitar'}</h3>
-                            <p class="text-sm">${statusAtual.step1Detail || 'Aguardando aceitação'}</p>
-                        </span>
-                    </li>
-                    <li class="${getStepClasses(statusAtual.step2)}">
-                        ${getStepMarker(statusAtual.step2, 2)}
-                        <span>
-                            <h3 class="font-medium leading-tight">${statusAtual.step2Title || 'Em Produção'}</h3>
-                            <p class="text-sm">${statusAtual.step2Detail || 'Aguardando início'}</p>
-                        </span>
-                    </li>
-                    <li class="${getStepClasses(statusAtual.step3)}">
-                        ${getStepMarker(statusAtual.step3, 3)}
-                        <span>
-                            <h3 class="font-medium leading-tight">${statusAtual.step3Title || 'Saiu para entrega'}</h3>
-                            <p class="text-sm">${statusAtual.step3Detail || 'Aguardando envio'}</p>
-                        </span>
-                    </li>
-                </ol>
-            `;
-
-          const div = document.createElement('div');
-          div.className = 'bg-white p-6 shadow-lg rounded-xl product-list-item transform hover:scale-[1.01] transition-transform duration-300';
-          div.innerHTML = `
+            div.innerHTML = `
                 <div class="flex items-start justify-between mb-4">
                     <div>
-                        <h3 class="text-2xl font-bold text-amber-800">Encomenda #${encomenda.id}</h3>
-                        <p class="text-gray-700">Cliente: ${encomenda.cliente_nome} (${encomenda.cliente_email})</p>
-                        <p class="text-gray-700">Data: ${new Date(encomenda.data_encomenda).toLocaleString()}</p>
+                        <h3 class="text-xl font-bold text-amber-800">Encomenda #${encomenda.id}</h3>
+                        <p class="text-gray-700 text-sm">Cliente: ${encomenda.cliente_nome}</p>
                     </div>
                     <div class="text-right">
-                        <p class="text-gray-500">Valor Total:</p>
-                        <p class="text-2xl font-bold text-amber-700">R$ ${valorTotal.toFixed(2)}</p>
+                        <p class="text-gray-500 text-sm">Valor Total:</p>
+                        <p class="text-xl font-bold text-amber-700">R$ ${valorTotal.toFixed(2)}</p>
                     </div>
                 </div>
                 <div class="border-t border-gray-200 pt-4 mt-4">
-                    ${stepperHTML}
-                    ${statusAtual.actionBtn}
-                </div>
-                <div class="border-t border-gray-200 pt-4 mt-4">
-                    <h4 class="font-semibold text-gray-800 text-lg mb-2">Detalhes da Entrega:</h4>
-                    <p class="text-gray-700">Endereço: ${encomenda.endereco}, ${encomenda.numero}</p>
-                    <p class="text-gray-700">Forma de Pagamento: ${encomenda.forma_pagamento}</p>
-                </div>
-                <div class="border-t border-gray-200 pt-4 mt-4">
-                    <h4 class="font-semibold text-gray-800 text-lg mb-2">Produtos da Encomenda:</h4>
+                    <h4 class="font-semibold text-gray-800 text-base mb-2">Produtos:</h4>
                     <div class="space-y-2">
                         ${produtosHTML}
                     </div>
                 </div>
+                <div class="border-t border-gray-200 pt-4 mt-4 text-center">
+                    ${actionBtn}
+                </div>
             `;
-          lista.appendChild(div);
+
+            // Adiciona o card ao contêiner correto
+            if (encomenda.status_encomenda === 'Aceitar') {
+                document.getElementById('encomendas-aceitar').appendChild(div);
+            } else if (encomenda.status_encomenda === 'Em Produção') {
+                document.getElementById('encomendas-producao').appendChild(div);
+            } else if (encomenda.status_encomenda === 'Saiu para entrega') {
+                document.getElementById('encomendas-entrega').appendChild(div);
+            }
         });
-      } catch (error) {
+    } catch (error) {
         console.error('Erro ao carregar encomendas:', error);
-        document.getElementById('listaEncomendas').innerHTML = '<p class="text-center text-red-500">Erro ao carregar a lista de encomendas.</p>';
-      }
+        document.getElementById('encomendas-aceitar').innerHTML = '<p class="text-center text-red-500">Erro ao carregar a lista de encomendas.</p>';
     }
+}
     // Nova função para avançar o status da encomenda
     async function avancarStatus(id, novoStatus) {
       const token = localStorage.getItem('token');
