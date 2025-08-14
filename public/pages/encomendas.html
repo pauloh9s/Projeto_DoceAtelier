@@ -97,7 +97,7 @@
       try {
         const token = localStorage.getItem('token');
         if (!token) {
-          window.location.href = './login.html'; // Redireciona para o login se não houver token
+          window.location.href = '../login/index.html'; // Redireciona para o login se não houver token
           return;
         }
 
@@ -108,7 +108,7 @@
         });
 
         if (res.status === 401) {
-          window.location.href = './login.html';
+          window.location.href = '../login/index.html';
           return;
         }
 
