@@ -141,6 +141,7 @@
           </div>
           <input id="modal-product-image" name="imagem" type="file" class="hidden" accept="image/*">
         </div>
+
         <div class="grid gap-6 md:grid-cols-2">
           <div>
             <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nome</label>
@@ -306,7 +307,7 @@
     // --- Funções de Inicialização e Eventos ---
     document.addEventListener('DOMContentLoaded', () => {
       if (!token) {
-        window.location.href = '/login.html';
+        window.location.href = '../login/index.html';
         return;
       }
 
@@ -332,7 +333,6 @@
     async function iniciarDashboard() {
       await carregarCategorias();
       alternarTab(encomendasTab, produtosTab, encomendasContent, produtosContent);
-    }
 
     // --- Funções de Produtos ---
     async function carregarCategorias() {
@@ -710,7 +710,7 @@
 
           const div = document.createElement('div');
           div.className = 'bg-amber-50 p-6 shadow-lg rounded-xl border border-amber-300 mb-4';
-
+          
             let actionBtn = '';
             if (encomenda.status_encomenda === 'Aceitar') {
       

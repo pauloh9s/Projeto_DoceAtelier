@@ -16,20 +16,20 @@ Construir uma solução que vise facilitar a gestão de pedidos, com uma persona
 - [x] Definir as tecnologias principais
 - [x] Criar estrutura inicial do projeto
 - [x] Prototipo da interface
-- [ ] Configurar controle de versões e contribuições
+- [x] Configurar controle de versões e contribuições
 
 ## ⚙️ Funcionalidades 
 ### A confeitaria pode...
 - [x] Cadastrar novas categorias e novos pratos
 - [x] Editar categorias e pratos
 - [x] Deletar categorias e pratos
-- [ ] Alterar a disponibilidade dos pratos
+- [x] Alterar a disponibilidade dos pratos
 - [x] Alterar quantidade do estoque dos pratos
-- [ ] Alterar o status de pedido entre: 'Em análise', 'Em produção' e 'Saiu para entrega'
-- [ ] Finalizar pedido
+- [x] Alterar o status de pedido entre: 'Em análise', 'Em produção' e 'Saiu para entrega'
+- [x] Finalizar pedido
 ### O cliente pode...
 - [x] Listar pratos
-- [ ] Filtrar pratos por busca ou por categorias
+- [x] Filtrar pratos por busca ou por categorias
 - [ ] Cadastrar-se com nome e número de telefone
 - [x] Realizar pedido
 

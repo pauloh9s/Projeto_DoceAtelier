@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="./css/login.css">
+    <link rel="stylesheet" href="../css/login.css">
     <title>Doce Atelier - Login</title>
 </head>
 
@@ -12,7 +12,7 @@
 
     <div class="container container-login">
         <div class="logo">
-            <img src="assets/Doce_Atelier-logo.png" alt="Logo Doce Atelier">
+            <img src="../assets/Doce_Atelier-logo.png" alt="Logo Doce Atelier">
         </div>
 
         <div class="login-box">
@@ -48,7 +48,7 @@
                     const result = await res.json();
                     localStorage.setItem('token', result.token); //verifica o token
                     alert('Logado com sucesso!');
-                    window.location.href = './pages/dashboard.html'; // Redireciona para a próxima página
+                    window.location.href = '../pages/dashboard.html'; // Redireciona para a próxima página
                 } else {
                     alert('Credenciais inválidas!');
                 }
