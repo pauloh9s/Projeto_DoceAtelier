@@ -710,18 +710,18 @@
 
           const div = document.createElement('div');
           div.className = 'bg-amber-50 p-6 shadow-lg rounded-xl border border-amber-300 mb-4';
-
-          let actionBtn = '';
-          if (encomenda.status_encomenda === 'Aceitar') {
-
-            actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Em Produção')" class="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors">Aceitar Pedido</button>`;
-          } else if (encomenda.status_encomenda === 'Em Produção') {
-
-            actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Saiu para entrega')" class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors">Marcar como "Saiu para entrega"</button>`;
-          } else if (encomenda.status_encomenda === 'Saiu para entrega') {
-
-            actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Entregue')" class="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors">Finalizar Pedido</button>`;
-          }
+          
+            let actionBtn = '';
+            if (encomenda.status_encomenda === 'Aceitar') {
+      
+                actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Em Produção')" class="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors">Aceitar Pedido</button>`;
+            } else if (encomenda.status_encomenda === 'Em Produção') {
+          
+                actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Saiu para entrega')" class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors">Marcar como "Saiu para entrega"</button>`;
+            } else if (encomenda.status_encomenda === 'Saiu para entrega') {
+           
+                actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Entregue')" class="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors">Finalizar Pedido</button>`;
+            }
 
 
           div.innerHTML = `
