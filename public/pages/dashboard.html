@@ -141,6 +141,7 @@
           </div>
           <input id="modal-product-image" name="imagem" type="file" class="hidden" accept="image/*">
         </div>
+
         <div class="grid gap-6 md:grid-cols-2">
           <div>
             <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nome</label>
@@ -332,7 +333,6 @@
     async function iniciarDashboard() {
       await carregarCategorias();
       alternarTab(encomendasTab, produtosTab, encomendasContent, produtosContent);
-    }
 
     // --- Funções de Produtos ---
     async function carregarCategorias() {
