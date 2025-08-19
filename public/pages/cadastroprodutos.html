@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Produtos - Doce Atelier</title>
+    <link rel="stylesheet" href="../css/cadastroprodutos.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body class="bg-amber-50">
+    <!-- Header -->
+    <header class="fixed w-full z-50 bg-white shadow-md">
+        <nav class="container mx-auto px-6 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center">
+                    <a href="./dashboard.html"
+                        class="text-2xl font-bold text-amber-800 hover:text-amber-600 transition">
+                        <img id="img-logo" src="../assets/header_logo.png" alt="Doçura">
+                    </a>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="./dashboard.html"
+                        class="text-amber-800 hover:text-amber-600 transition font-medium">Voltar</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="pt-32 pb-16">
+        <div class="container mx-auto px-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-amber-800 mb-12">Cadastro de Produtos</h1>
+
+            <!-- Product Form -->
+            <div class="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-8">
+                <form id="product-form" class="space-y-6">
+                    <!-- Product Image -->
+                    <div>
+                        <label class="block text-gray-700 mb-2">Imagem do Produto</label>
+                        <div class="flex items-center justify-center w-full">
+                            <label for="product-image"
+                                class="flex flex-col items-center justify-center w-full h-64 border-2 border-amber-300 border-dashed rounded-lg cursor-pointer bg-amber-50 hover:bg-amber-100">
+                                <div id="image-preview-content" class="flex flex-col items-center justify-center pt-5 pb-6">
+                                    <i class="fas fa-camera text-amber-400 text-4xl mb-3"></i>
+                                    <p class="mb-2 text-sm text-gray-500">Clique para adicionar uma imagem</p>
+                                </div>
+                                <input id="product-image" name="imagem" type="file" class="hidden" accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Product Details -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="product-name" class="block text-gray-700 mb-2">Nome do Produto</label>
+                            <input type="text" id="product-name" required
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+
+                        <div>
+                            <label for="product-price" class="block text-gray-700 mb-2">Preço (R$)</label>
+                            <input type="number" id="product-price" step="0.01" min="0" required
+                                class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="product-category" class="block text-gray-700 mb-2">Categoria</label>
+                        <select id="product-category" required
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500">
+                            <option value="">Selecione uma categoria</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="product-description" class="block text-gray-700 mb-2">Descrição</label>
+                        <textarea id="product-description" rows="4" required
+                            class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500"></textarea>
+                    </div>
+
+                    <div class="flex items-center">
+                        <input type="checkbox" id="product-featured"
+                            class="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500">
+                        <label for="product-featured" class="ml-2 block text-gray-700">Destacar produto?</label>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="flex justify-end space-x-4 pt-4">
+                        <button type="reset"
+                            class="px-6 py-2 border border-amber-600 text-amber-600 rounded-lg hover:bg-amber-50 transition">
+                            Limpar
+                        </button>
+                        <button type="submit"
+                            class="px-6 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition">
+                            Salvar Produto
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-amber-900 text-white py-8">
+        <div class="container mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="mb-4 md:mb-0 flex flex-col items-center md:items-center">
+                    <a href="#" class="text-2xl font-bold text-white hover:text-amber-200 transition">
+                        <img id="img-logo" src="img/Doce_Atelier-Logo-PB.png" alt="Doçura">
+                    </a>
+                    <p class="mt-2 text-white">Confeitaria Artesanal</p>
+                </div>
+                <div class="flex flex-col items-center md:items-end">
+                    <p>&copy; 2025 Doçura. Todos os direitos reservados.</p>
+                    <p class="text-amber-200">Cardápio Digital</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            gerarOpcoesCategorias(); // Carregar categorias
+
+            const form = document.getElementById("product-form");
+            const previewContent = document.getElementById('image-preview-content');
+            const imagemInput = document.getElementById("product-image");
+
+
+            // Pré-visualização da imagem
+            imagemInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        previewContent.innerHTML = `<img src="${event.target.result}" class="max-h-64 rounded-lg" alt="Preview">`;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    previewContent.innerHTML = `
+                    <i class="fas fa-camera text-amber-400 text-4xl mb-3"></i>
+                    <p class="mb-2 text-sm text-gray-500">Clique para adicionar uma imagem</p>
+                `;
+                }
+            });
+            window.addEventListener('scroll', () => {
+                const header = document.querySelector('header');
+                if (window.scrollY > 50) {
+                    header.classList.add('shadow-lg');
+                } else {
+                    header.classList.remove('shadow-lg');
+                }
+            });
+
+            const productCards = document.querySelectorAll('.product-card');
+            productCards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    card.classList.add('transform');
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.classList.remove('transform');
+                });
+            });
+
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const targetId = this.getAttribute('href');
+                    if (targetId === '#') return;
+
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        window.scrollTo({
+                            top: targetElement.offsetTop - 80,
+                            behavior: 'smooth'
+                        });
+
+                        // Close mobile menu if open
+                        if (!mobileMenu.classList.contains('hidden')) {
+                            mobileMenu.classList.add('hidden');
+                        }
+                    }
+                });
+            });
+
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+
+                const formData = new FormData();
+
+                // Coleta os dados
+                const nome = document.getElementById('product-name').value;
+                let preco = document.getElementById('product-price').value;
+                const nome_categoria = document.getElementById('product-category').value;
+                const descricao = document.getElementById('product-description').value;
+                const destaque = document.getElementById('product-featured').checked;
+
+                const imagem = imagemInput?.files?.[0] ?? null;
+
+                if (!nome || !preco || !nome_categoria || !descricao) {
+                    alert("Preencha todos os campos obrigatórios.");
+                    return;
+                }
+
+                preco = parseFloat(preco);
+                if (isNaN(preco) || preco <= 0) {
+                    alert("Por favor, insira um preço válido.");
+                    return;
+                }
+
+                // Adiciona ao FormData
+                formData.append('nome', nome);
+                formData.append('preco', preco);
+                formData.append('nome_categoria', nome_categoria);
+                formData.append('descricao', descricao);
+                formData.append('destaque', destaque);
+
+                if (imagem) {
+                    formData.append('imagem', imagem);
+                }
+
+                try {
+                    const headers = new Headers();
+                    headers.append('Authorization', `Bearer ${localStorage.getItem('token')}`);
+
+                    const response = await fetch('/api/produtos', {
+                        method: 'POST',
+                        headers: headers, // Não incluir Content-Type ao usar FormData
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(errorText);
+                    }
+
+                    alert('Produto criado com sucesso!');
+                    form.reset();
+                    previewContent.innerHTML = `
+                        <i class="fas fa-camera text-amber-400 text-4xl mb-3"></i>
+                        <p class="mb-2 text-sm text-gray-500">Clique para adicionar uma imagem</p>
+                        `;
+                } catch (error) {
+                    console.error('Erro ao criar o produto:', error);
+                    alert(`Erro ao criar o produto: ${error.message}`);
+                }
+            });
+        });
+
+        async function gerarOpcoesCategorias() {
+            try {
+                const response = await fetch('/api/categorias');
+                if (!response.ok) throw new Error('Erro ao carregar categorias');
+                const categorias = await response.json();
+                const select = document.getElementById('product-category');
+                categorias.forEach(c => {
+                    const option = document.createElement('option');
+                    option.value = c.nome;
+                    option.textContent = c.nome.charAt(0).toUpperCase() + c.nome.slice(1);
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao buscar categorias:', error);
+                alert('Erro ao carregar categorias.');
+            }
+        }
+    </script>
+
+</body>
+
+</html>

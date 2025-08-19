@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/login.css">
+    <title>Doce Atelier - Login</title>
+</head>
+
+<body>
+
+    <div class="container container-login">
+        <div class="logo">
+            <img src="../assets/header_logo.png" alt="Logo Doce Atelier">
+        </div>
+
+        <div class="login-box">
+            <div class="login-logo">
+                Acesse sua conta
+            </div>
+            <form onsubmit="login(event)">
+                <input type="text" class="input-field" placeholder="Login" id="username">
+                <input type="password" class="input-field" placeholder="Senha" id="senha">
+                <button type="submit" class="login-button">Entrar</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        const token = localStorage.getItem('token');
+
+        async function login(e) {
+            e.preventDefault();
+
+            const data = {
+                username: document.getElementById('username').value,
+                senha: document.getElementById('senha').value
+            };
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    const result = await res.json();
+                    localStorage.setItem('token', result.token); //verifica o token
+                    alert('Logado com sucesso!');
+                    window.location.href = '../pages/dashboard.html'; // Redireciona para a próxima página
+                } else {
+                    alert('Credenciais inválidas!');
+                }
+            } catch (error) {
+                alert('Erro ao conectar com o servidor.');
+                console.error(error);
+            }
+        }
+
+    </script>
+</body>
+
+</html>

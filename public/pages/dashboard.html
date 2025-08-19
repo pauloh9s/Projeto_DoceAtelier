@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Área Administrativa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    .product-list-item:hover {
+      background-color: #fcf5e9;
+    }
+
+    .tab-button {
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    .tab-button.active {
+      border-color: #FACC15;
+      /* Cor de destaque do Tailwind: amber-400 */
+      color: #78350F;
+      /* Texto do Tailwind: amber-900 */
+      font-weight: bold;
+    }
+
+    .tab-button:not(.active):hover {
+      border-color: #FDE68A;
+      /* amber-200 */
+    }
+  </style>
+</head>
+
+<body class="bg-amber-50 font-sans antialiased text-gray-800 flex flex-col min-h-screen">
+
+  <header class="bg-white shadow-md py-4 fixed w-full top-0 z-50">
+    <div class="container mx-auto px-6 flex justify-between items-center">
+      <h1 class="text-3xl font-extrabold tracking-tight">
+        <a href="#" class="text-amber-800 hover:text-amber-600 transition-colors">
+          DashBoard - Confeitaria
+        </a>
+      </h1>
+      <nav class="flex items-center space-x-4">
+        <a href="../index.html" class="text-amber-800 hover:text-amber-600 transition-colors font-semibold text-lg">Ver
+          Loja</a>
+        <a href="./cadastroprodutos.html"
+          class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg">
+          Cadastrar Produto
+        </a>
+        <button id="gerenciarCategoriasBtn"
+          class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg">
+          Gerenciar Categorias
+        </button>
+        <button onclick="logout()"
+          class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-bold transition-colors">Sair</button>
+      </nav>
+    </div>
+  </header>
+
+  <div id="update-success-alert"
+    class="hidden fixed top-0 left-1/2 -translate-x-1/2 mt-4 z-50 w-full max-w-xl mx-auto px-4">
+    <div class="flex items-center p-6 rounded-2xl text-green-800 border-t-4 border-green-300 bg-green-50 shadow-2xl"
+      role="alert">
+      <svg class="flex-shrink-0 w-6 h-6" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+        viewBox="0 0 20 20">
+        <path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm9.5 9.5h-10a1 1 0 0 1 0-2h10a1 1 0 0 1 0 2Z" />
+      </svg>
+      <div id="alert-message" class="ml-4 text-base font-semibold">
+        O produto foi atualizado com sucesso!
+      </div>
+      <button type="button" onclick="hideAlert('update-success-alert')"
+        class="ml-auto -mx-1.5 -my-1.5 bg-green-50 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-2.5 hover:bg-green-200 inline-flex items-center justify-center h-10 w-10">
+        <span class="sr-only">Fechar</span>
+        <svg class="w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="pt-24">
+    <main class="container mx-auto px-6 py-8">
+      <div class="border-b border-gray-200 dark:border-gray-700 mb-8">
+        <ul class="flex flex-wrap -mb-px text-lg font-medium text-center text-gray-500 dark:text-gray-400">
+          <li class="me-2">
+            <a id="encomendas-tab" href="#" class="inline-flex items-center justify-center p-4 rounded-t-lg tab-button">
+              <i class="fa-solid fa-list-check mr-2"></i> Encomendas
+            </a>
+          </li>
+          <li class="me-2">
+            <a id="produtos-tab" href="#"
+              class="inline-flex items-center justify-center p-4 rounded-t-lg tab-button active" aria-current="page">
+              <i class="fa-solid fa-cookie-bite mr-2"></i> Produtos
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <div id="produtos-content" class="tab-content hidden">
+        <h2 class="text-4xl font-extrabold text-amber-800 mb-8 text-center">Gerenciar Produtos</h2>
+        <div class="mt-8">
+          <h3 class="text-3xl font-bold text-amber-800 mb-6">Produtos Cadastrados</h3>
+          <div id="listaProdutosAdmin" class="flex flex-col gap-4">
+          </div>
+        </div>
+      </div>
+
+      <div id="encomendas-content" class="tab-content">
+        <h2 class="text-4xl font-extrabold text-amber-800 mb-8 text-center">Gerenciar Encomendas</h2>
+        <div class="mt-8">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div id="encomendas-aceitar" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+              <h3 class="text-2xl font-bold mb-4 text-gray-700">Aguardando Aceitação</h3>
+            </div>
+
+            <div id="encomendas-producao" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+              <h3 class="text-2xl font-bold mb-4 text-gray-700">Em Produção</h3>
+            </div>
+
+            <div id="encomendas-entrega" class="bg-gray-100 p-4 rounded-lg shadow-inner">
+              <h3 class="text-2xl font-bold mb-4 text-gray-700">Para Entrega</h3>
+            </div>
+    </main>
+  </div>
+
+  <div id="crud-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg mx-4 p-8 relative">
+      <button id="closeModal" class="absolute top-4 right-4 text-gray-600 hover:text-black transition-colors text-3xl">
+        &times;
+      </button>
+      <h3 class="text-3xl font-extrabold text-amber-800 mb-6 text-center tracking-wide">Editar Produto</h3>
+      <form id="modal-form" class="space-y-6">
+        <div class="flex flex-col items-center justify-center space-y-2">
+          <label for="modal-product-image" class="w-full text-center text-sm font-semibold text-gray-700">Imagem do
+            Produto</label>
+          <div id="modal-image-preview-container"
+            class="w-full h-40 border-2 border-amber-300 border-dashed rounded-lg cursor-pointer bg-amber-50 hover:bg-amber-100 flex items-center justify-center overflow-hidden">
+          </div>
+          <input id="modal-product-image" name="imagem" type="file" class="hidden" accept="image/*">
+        </div>
+        <div class="grid gap-6 md:grid-cols-2">
+          <div>
+            <label for="name" class="block text-sm font-semibold text-gray-700 mb-1">Nome</label>
+            <input type="text" id="name"
+              class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+              placeholder="Digite o nome" required />
+          </div>
+          <div>
+            <label for="price" class="block text-sm font-semibold text-gray-700 mb-1">Preço</label>
+            <input type="number" id="price"
+              class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 placeholder-gray-400"
+              placeholder="R$ 100,00" required />
+          </div>
+          <div class="md:col-span-2">
+            <label for="category" class="block text-sm font-semibold text-gray-700 mb-1">Categoria</label>
+            <select id="category"
+              class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200">
+            </select>
+          </div>
+          <div class="md:col-span-2">
+            <label for="description" class="block text-sm font-semibold text-gray-700 mb-1">Descrição</label>
+            <textarea id="description" rows="3"
+              class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200 placeholder-gray-400 resize-none"
+              placeholder="Descreva o produto..."></textarea>
+          </div>
+          <button type="submit"
+            class="md:col-span-2 w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2 focus:ring-offset-white">
+            Atualizar Produto
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <div id="categorias-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4 p-8 relative">
+      <button id="closeCategoriasModal"
+        class="absolute top-4 right-4 text-gray-600 hover:text-black transition-colors text-3xl">
+        &times;
+      </button>
+      <h3 class="text-3xl font-extrabold text-amber-800 mb-6 text-center tracking-wide">Gerenciar Categorias</h3>
+      <div class="mb-6 border-b pb-6">
+        <h4 class="text-xl font-bold text-amber-800 mb-4">Adicionar Nova Categoria</h4>
+        <form id="add-categoria-form" class="flex flex-col md:flex-row gap-4 items-end">
+          <div class="flex-grow w-full">
+            <label for="new-categoria-nome" class="block text-sm font-semibold text-gray-700 mb-1">Nome</label>
+            <input type="text" id="new-categoria-nome"
+              class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+              placeholder="Ex: Bolos, Doces Finos..." required />
+          </div>
+          <div class="flex-grow w-full">
+            <label for="new-categoria-descricao"
+              class="block text-sm font-semibold text-gray-700 mb-1">Descrição</label>
+            <input type="text" id="new-categoria-descricao"
+              class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+              placeholder="Breve descrição da categoria" required />
+          </div>
+          <button type="submit"
+            class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-all duration-300 transform hover:scale-105">
+            Adicionar
+          </button>
+        </form>
+      </div>
+      <div>
+        <h4 class="text-xl font-bold text-amber-800 mb-4">Categorias Existentes</h4>
+        <div id="listaCategorias" class="flex flex-col gap-3 max-h-64 overflow-y-auto pr-2">
+          <p class="text-center text-gray-500">Nenhuma categoria encontrada.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="editar-categoria-modal"
+    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden backdrop-blur-sm">
+    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-8 relative">
+      <button id="closeEditarCategoriaModal"
+        class="absolute top-4 right-4 text-gray-600 hover:text-black transition-colors text-3xl">
+        &times;
+      </button>
+      <h3 class="text-3xl font-extrabold text-amber-800 mb-6 text-center tracking-wide">Editar Categoria</h3>
+      <form id="editar-categoria-form" class="space-y-4">
+        <input type="hidden" id="edit-categoria-original-nome">
+        <div>
+          <label for="edit-categoria-nome" class="block text-sm font-semibold text-gray-700 mb-1">Nome</label>
+          <input type="text" id="edit-categoria-nome"
+            class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+            required />
+        </div>
+        <div>
+          <label for="edit-categoria-descricao" class="block text-sm font-semibold text-gray-700 mb-1">Descrição</label>
+          <input type="text" id="edit-categoria-descricao"
+            class="w-full bg-gray-100 text-gray-800 border border-gray-300 rounded-lg py-2 px-4 focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all duration-200"
+            required />
+        </div>
+        <button type="submit"
+          class="w-full bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 transform hover:scale-105">
+          Salvar Alterações
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="pt-24 flex-grow">
+    <main class="container mx-auto px-6 py-8">
+    </main>
+  </div>
+
+  <footer class="bg-amber-900 text-white py-8 mt-auto">
+    <div class="container mx-auto px-6 text-center">
+      <p>&copy; 2025 Doçura. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    const token = localStorage.getItem('token');
+    let categorias = [];
+
+    // --- Funções Auxiliares ---
+    function showAlert(message) {
+      const alert = document.getElementById('update-success-alert');
+      const alertMessage = document.getElementById('alert-message');
+      alertMessage.textContent = message;
+      alert.classList.remove('hidden');
+      setTimeout(() => {
+        hideAlert('update-success-alert');
+      }, 5000);
+    }
+
+    function hideAlert(alertId) {
+      const alert = document.getElementById(alertId);
+      alert.classList.add('hidden');
+    }
+
+    function fecharModal(modalId) {
+      const modal = document.getElementById(modalId);
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // --- Lógica de Tabs ---
+    const produtosTab = document.getElementById('produtos-tab');
+    const encomendasTab = document.getElementById('encomendas-tab');
+    const produtosContent = document.getElementById('produtos-content');
+    const encomendasContent = document.getElementById('encomendas-content');
+
+    produtosTab.addEventListener('click', (e) => {
+      e.preventDefault();
+      alternarTab(produtosTab, encomendasTab, produtosContent, encomendasContent);
+    });
+
+    encomendasTab.addEventListener('click', (e) => {
+      e.preventDefault();
+      alternarTab(encomendasTab, produtosTab, encomendasContent, produtosContent);
+    });
+
+    function alternarTab(tabAtiva, tabInativa, contentAtivo, contentInativo) {
+      tabAtiva.classList.add('active');
+      tabInativa.classList.remove('active');
+      contentAtivo.classList.remove('hidden');
+      contentInativo.classList.add('hidden');
+
+      if (tabAtiva.id === 'encomendas-tab') {
+        carregarEncomendas();
+      } else if (tabAtiva.id === 'produtos-tab') {
+        carregarProdutosAdmin();
+      }
+    }
+
+    // --- Funções de Inicialização e Eventos ---
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!token) {
+        window.location.href = '/login.html';
+        return;
+      }
+
+      iniciarDashboard();
+
+      document.getElementById('gerenciarCategoriasBtn').addEventListener('click', abrirModalCategorias);
+      document.getElementById('closeCategoriasModal').addEventListener('click', () => fecharModal('categorias-modal'));
+      document.getElementById('closeEditarCategoriaModal').addEventListener('click', () => fecharModal('editar-categoria-modal'));
+      document.getElementById('closeModal').addEventListener('click', () => fecharModal('crud-modal'));
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          fecharModal('crud-modal');
+          fecharModal('categorias-modal');
+          fecharModal('editar-categoria-modal');
+        }
+      });
+
+      document.getElementById('add-categoria-form').addEventListener('submit', adicionarCategoria);
+      document.getElementById('editar-categoria-form').addEventListener('submit', salvarEdicaoCategoria);
+    });
+
+    async function iniciarDashboard() {
+      await carregarCategorias();
+      alternarTab(encomendasTab, produtosTab, encomendasContent, produtosContent);
+    }
+
+    // --- Funções de Produtos ---
+    async function carregarCategorias() {
+      try {
+        const res = await fetch('/api/categorias');
+        if (!res.ok) throw new Error('Erro ao carregar categorias');
+        categorias = await res.json();
+        const select = document.getElementById('category');
+        select.innerHTML = '';
+        categorias.forEach(c => {
+          const option = document.createElement('option');
+          option.value = c.nome;
+          option.textContent = c.nome.charAt(0).toUpperCase() + c.nome.slice(1);
+          select.appendChild(option);
+        });
+      } catch (error) {
+        console.error('Erro ao buscar categorias:', error);
+      }
+    }
+
+    async function carregarProdutosAdmin() {
+      const res = await fetch('/api/admin/produtos', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!res.ok) {
+        console.error('Falha ao carregar produtos do admin.');
+        return;
+      }
+      const produtos = await res.json();
+      const lista = document.getElementById('listaProdutosAdmin');
+      lista.innerHTML = '';
+      produtos.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'product-list-item bg-white rounded-lg shadow-md p-4 flex items-center justify-between transition-colors';
+        const categoriaNome = p.nome_categoria;
+        div.innerHTML = `
+                <div class="flex items-center space-x-4 flex-grow">
+                    <img src="${p.imagem_url}" alt="${p.nome}" class="w-16 h-16 object-cover rounded-md flex-shrink-0">
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-semibold text-amber-800">${p.nome}</h3>
+                        <p class="text-sm text-gray-500">Categoria: ${categoriaNome}</p>
+                        <span class="text-base font-bold text-amber-600">R$ ${p.preco}</span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <div class="flex items-center mr-4">
+                        <span class="text-sm font-medium text-gray-700 mr-2">Disponível</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" ${p.disponivel ? 'checked' : ''} class="sr-only peer" onchange="alternarDisponibilidade(${p.id}, this.checked)">
+                            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-[1.2rem] peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        </label>
+                    </div>
+                    <button onclick="abrirModalEdicao(${p.id}, '${p.nome}', ${p.preco}, '${p.descricao}', '${p.imagem_url}', '${p.nome_categoria}')"
+                        class="bg-yellow-500 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-yellow-600 transition-colors text-sm">
+                        Editar
+                    </button>
+                    <button onclick="deletarProduto(${p.id})"
+                        class="bg-red-500 text-white px-3 py-1.5 rounded-lg font-semibold hover:bg-red-600 transition-colors text-sm">
+                        Excluir
+                    </button>
+                </div>
+            `;
+        lista.appendChild(div);
+      });
+    }
+
+    async function alternarDisponibilidade(id, disponivel) {
+      try {
+        const response = await fetch(`/api/produtos/${id}/disponibilidade`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            disponivel
+          })
+        });
+        if (!response.ok) {
+          throw new Error('Falha ao atualizar a disponibilidade.');
+        }
+        showAlert(`Disponibilidade do produto atualizada para ${disponivel ? 'disponível' : 'indisponível'}.`);
+      } catch (error) {
+        console.error('Erro ao atualizar disponibilidade:', error);
+        alert('Erro ao atualizar a disponibilidade do produto.');
+        carregarProdutosAdmin();
+      }
+    }
+
+    function abrirModalEdicao(id, nome, preco, descricao, imagem_url, nome_categoria) {
+      document.getElementById('name').value = nome;
+      document.getElementById('price').value = preco;
+      document.getElementById('description').value = descricao;
+      document.getElementById('category').value = nome_categoria;
+      const previewContainer = document.getElementById('modal-image-preview-container');
+      const imagemInputModal = document.getElementById('modal-product-image');
+      if (imagem_url) {
+        previewContainer.innerHTML = `<img src="${imagem_url}" class="max-h-full max-w-full rounded-lg" alt="Imagem atual">`;
+      } else {
+        previewContainer.innerHTML = `<span class="text-gray-500">Nenhuma imagem</span>`;
+      }
+      const modal = document.getElementById('crud-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      imagemInputModal.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            previewContainer.innerHTML = `<img src="${event.target.result}" class="max-h-full max-w-full rounded-lg" alt="Preview">`;
+          };
+          reader.readAsDataURL(file);
+        } else {
+          if (imagem_url) {
+            previewContainer.innerHTML = `<img src="${imagem_url}" class="max-h-full max-w-full rounded-lg" alt="Imagem atual">`;
+          } else {
+            previewContainer.innerHTML = `<span class="text-gray-500">Nenhuma imagem</span>`;
+          }
+        }
+      });
+      const form = document.getElementById('modal-form');
+      form.onsubmit = async function (e) {
+        e.preventDefault();
+        const formData = new FormData();
+        const novaImagem = imagemInputModal.files[0];
+        formData.append('nome', document.getElementById('name').value);
+        formData.append('preco', document.getElementById('price').value);
+        formData.append('nome_categoria', document.getElementById('category').value);
+        formData.append('descricao', document.getElementById('description').value);
+        formData.append('imagem_url', imagem_url || '');
+        if (novaImagem) {
+          formData.append('imagem', novaImagem);
+        }
+        try {
+          const response = await fetch(`/api/produtos/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`
+            },
+            body: formData
+          });
+          if (!response.ok) {
+            throw new Error('Falha ao atualizar o produto.');
+          }
+          showAlert("O produto foi atualizado com sucesso!");
+          modal.classList.add('hidden');
+          carregarProdutosAdmin();
+        } catch (err) {
+          console.error(err);
+          alert("Erro ao atualizar produto.");
+        }
+      };
+    }
+
+    async function deletarProduto(id) {
+      const confirmacao = confirm("Tem certeza que deseja deletar este produto?");
+      if (!confirmacao) return;
+      try {
+        const resposta = await fetch(`/api/produtos/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+        });
+        if (!resposta.ok) {
+          throw new Error(`Erro ao deletar produto: ${resposta.status}`);
+        }
+        carregarProdutosAdmin();
+      } catch (erro) {
+        console.error('Erro ao deletar produto:', erro);
+        alert('Não foi possível deletar o produto. Verifique o console.');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('token');
+      window.location.reload();
+    }
+
+    // --- Funções de Categorias ---
+    async function abrirModalCategorias() {
+      const modal = document.getElementById('categorias-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+      await carregarListaCategorias();
+    }
+
+    async function carregarListaCategorias() {
+      try {
+        const res = await fetch('/api/categorias');
+        if (!res.ok) throw new Error('Erro ao carregar categorias');
+        const categorias = await res.json();
+        const lista = document.getElementById('listaCategorias');
+        lista.innerHTML = '';
+        if (categorias.length === 0) {
+          lista.innerHTML = '<p class="text-center text-gray-500">Nenhuma categoria cadastrada.</p>';
+          return;
+        }
+        categorias.forEach(c => {
+          const div = document.createElement('div');
+          div.className = 'bg-gray-50 rounded-lg shadow-sm p-4 flex items-center justify-between transition-colors hover:bg-gray-100';
+          div.innerHTML = `
+                    <div>
+                        <h5 class="text-lg font-semibold text-gray-900">${c.nome.charAt(0).toUpperCase() + c.nome.slice(1)}</h5>
+                        <p class="text-sm text-gray-600">${c.descricao}</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="abrirModalEdicaoCategoria('${c.nome}', '${c.descricao}')"
+                            class="bg-yellow-500 text-white px-2 py-1 rounded-lg font-semibold hover:bg-yellow-600 transition-colors text-xs">
+                            Editar
+                        </button>
+                        <button onclick="deletarCategoria('${c.nome}')"
+                            class="bg-red-500 text-white px-2 py-1 rounded-lg font-semibold hover:bg-red-600 transition-colors text-xs">
+                            Excluir
+                        </button>
+                    </div>
+                `;
+          lista.appendChild(div);
+        });
+      } catch (error) {
+        console.error('Erro ao carregar lista de categorias:', error);
+        document.getElementById('listaCategorias').innerHTML = '<p class="text-center text-red-500">Erro ao carregar categorias.</p>';
+      }
+    }
+
+    async function adicionarCategoria(e) {
+      e.preventDefault();
+      const nome = document.getElementById('new-categoria-nome').value;
+      const descricao = document.getElementById('new-categoria-descricao').value;
+      const novaCategoria = {
+        nome,
+        descricao
+      };
+      try {
+        const response = await fetch('/api/categorias', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(novaCategoria)
+        });
+        if (!response.ok) {
+          throw new Error('Falha ao adicionar categoria.');
+        }
+        showAlert("Categoria adicionada com sucesso!");
+        document.getElementById('add-categoria-form').reset();
+        await carregarListaCategorias();
+        await carregarCategorias();
+      } catch (err) {
+        console.error('Erro ao adicionar categoria:', err);
+        alert('Erro ao adicionar categoria.');
+      }
+    }
+
+    function abrirModalEdicaoCategoria(nome, descricao) {
+      document.getElementById('edit-categoria-original-nome').value = nome;
+      document.getElementById('edit-categoria-nome').value = nome;
+      document.getElementById('edit-categoria-descricao').value = descricao;
+      fecharModal('categorias-modal');
+      const modal = document.getElementById('editar-categoria-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    async function salvarEdicaoCategoria(e) {
+      e.preventDefault();
+      const nomeOriginal = document.getElementById('edit-categoria-original-nome').value;
+      const novoNome = document.getElementById('edit-categoria-nome').value;
+      const descricao = document.getElementById('edit-categoria-descricao').value;
+      const categoriaAtualizada = {
+        nome: novoNome,
+        descricao
+      };
+      try {
+        const response = await fetch(`/api/categorias/${nomeOriginal}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(categoriaAtualizada)
+        });
+        if (!response.ok) {
+          throw new Error('Falha ao atualizar categoria.');
+        }
+        showAlert("Categoria atualizada com sucesso!");
+        fecharModal('editar-categoria-modal');
+        await carregarListaCategorias();
+        await carregarCategorias();
+      } catch (err) {
+        console.error('Erro ao atualizar categoria:', err);
+        alert('Erro ao atualizar categoria.');
+      }
+    }
+
+    async function deletarCategoria(nome) {
+      const confirmacao = confirm("Tem certeza que deseja deletar esta categoria? Todos os produtos vinculados a ela ficarão sem categoria!");
+      if (!confirmacao) return;
+      try {
+        const resposta = await fetch(`/api/categorias/${nome}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+        if (!resposta.ok) {
+          throw new Error(`Erro ao deletar categoria: ${resposta.status}`);
+        }
+        showAlert("Categoria deletada com sucesso!");
+        await carregarListaCategorias();
+        await carregarCategorias();
+      } catch (erro) {
+        console.error('Erro ao deletar categoria:', erro);
+        alert('Não foi possível deletar a categoria. Verifique o console.');
+      }
+    }
+
+    // --- Novas Funções de Encomendas ---
+    async function carregarEncomendas() {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch('/api/encomendas', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) throw new Error('Falha ao carregar encomendas');
+        const encomendas = await response.json();
+
+        document.getElementById('encomendas-aceitar').innerHTML = '<h2 class="text-2xl font-bold mb-4">Aceitar</h2>';
+        document.getElementById('encomendas-producao').innerHTML = '<h2 class="text-2xl font-bold mb-4">Em Produção</h2>';
+        document.getElementById('encomendas-entrega').innerHTML = '<h2 class="text-2xl font-bold mb-4">Para Entrega</h2>';
+
+        if (encomendas.length === 0) {
+          return;
+        }
+
+        encomendas.forEach(encomenda => {
+          if (encomenda.status_encomenda === 'Entregue') {
+            return;
+          }
+
+          const valorTotal = encomenda.produtos.reduce((total, p) => {
+            const quantidade = p.quantidade ? parseFloat(p.quantidade) : 0;
+            const preco = p.preco_unitario ? parseFloat(p.preco_unitario) : 0;
+            return total + (quantidade * preco);
+          }, 0);
+
+          // Formata a data para melhor visualização
+          const dataEncomenda = new Date(encomenda.data_encomenda);
+          const dataFormatada = dataEncomenda.toLocaleDateString('pt-BR', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+          }) + ' às ' + dataEncomenda.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+
+          const produtosHTML = encomenda.produtos.map(p => {
+            const precoFormatado = p.preco_unitario ? parseFloat(p.preco_unitario).toFixed(2) : '0.00';
+            return `
+            <div class="flex items-center justify-between space-x-3 bg-amber-100 p-3 rounded-lg shadow-sm">
+                <img src="${p.imagem_url}" alt="${p.nome_produto}" class="w-12 h-12 object-cover rounded-md">
+                <div class="flex-grow">
+                    <p class="font-semibold text-gray-800">${p.nome_produto} <span class="text-gray-500">(${p.quantidade}x)</span></p>
+                </div>
+                <p class="text-sm font-bold text-amber-700">R$ ${precoFormatado}</p>
+            </div>
+        `;
+          }).join('');
+
+          const div = document.createElement('div');
+          div.className = 'bg-amber-50 p-6 shadow-lg rounded-xl border border-amber-300 mb-4';
+
+          let actionBtn = '';
+          if (encomenda.status_encomenda === 'Aceitar') {
+
+            actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Em Produção')" class="mt-4 w-full bg-green-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors">Aceitar Pedido</button>`;
+          } else if (encomenda.status_encomenda === 'Em Produção') {
+
+            actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Saiu para entrega')" class="mt-4 w-full bg-blue-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-600 transition-colors">Marcar como "Saiu para entrega"</button>`;
+          } else if (encomenda.status_encomenda === 'Saiu para entrega') {
+
+            actionBtn = `<button onclick="avancarStatus(${encomenda.id}, 'Entregue')" class="mt-4 w-full bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition-colors">Finalizar Pedido</button>`;
+          }
+
+
+          div.innerHTML = `
+          <div class="flex items-start justify-between mb-4">
+              <div>
+                  <h3 class="text-xl font-bold text-amber-800">Encomenda #${encomenda.id}</h3>
+                  <p class="text-sm text-gray-600">Status: <span class="font-semibold">${encomenda.status_encomenda}</span></p>
+              </div>
+              <div class="text-right">
+                  <p class="text-gray-500 text-sm">Valor Total:</p>
+                  <p class="text-xl font-bold text-amber-700">R$ ${valorTotal.toFixed(2)}</p>
+              </div>
+          </div>
+          <div class="border-t border-amber-200 pt-4 mt-4 text-sm text-gray-700 space-y-1">
+              <p><strong>Cliente:</strong> ${encomenda.cliente_nome}</p>
+              <p><strong>Email:</strong> ${encomenda.cliente_email || 'Não informado'}</p>
+              <p><strong>Endereço:</strong> ${encomenda.endereco}, ${encomenda.numero}</p>
+              <p><strong>Forma de Pagamento:</strong> ${encomenda.forma_pagamento || 'Não informado'}</p>
+              <p><strong>Data do Pedido:</strong> ${dataFormatada}</p>
+          </div>
+          <div class="border-t border-amber-200 pt-4 mt-4">
+              <h4 class="font-semibold text-gray-800 text-base mb-2">Produtos:</h4>
+              <div class="space-y-2">
+                  ${produtosHTML}
+              </div>
+          </div>
+          <div class="border-t border-amber-200 pt-4 mt-4 text-center">
+              ${actionBtn}
+          </div>
+      `;
+
+          // Adiciona o card ao contêiner correto
+          if (encomenda.status_encomenda === 'Aceitar') {
+            document.getElementById('encomendas-aceitar').appendChild(div);
+          } else if (encomenda.status_encomenda === 'Em Produção') {
+            document.getElementById('encomendas-producao').appendChild(div);
+          } else if (encomenda.status_encomenda === 'Saiu para entrega') {
+            document.getElementById('encomendas-entrega').appendChild(div);
+          }
+        });
+      } catch (error) {
+        console.error('Erro ao carregar encomendas:', error);
+        document.getElementById('encomendas-aceitar').innerHTML = '<p class="text-center text-red-500">Erro ao carregar a lista de encomendas.</p>';
+      }
+    }
+    // Nova função para avançar o status da encomenda
+    async function avancarStatus(id, novoStatus) {
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`/api/encomendas/${id}/status`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          // Corrigido: Mude 'status' para 'status_encomenda'
+          body: JSON.stringify({ status_encomenda: novoStatus })
+        });
+
+        if (!response.ok) throw new Error('Falha ao atualizar o status da encomenda.');
+
+        carregarEncomendas();
+      } catch (error) {
+        console.error('Erro ao avançar status:', error);
+        alert('Erro ao atualizar o status da encomenda.');
+      }
+    }
+    async function deletarEncomenda(id) {
+      if (!confirm('Tem certeza que deseja deletar esta encomenda?')) {
+        return;
+      }
+      const token = localStorage.getItem('token');
+      try {
+        const response = await fetch(`/api/encomendas/${id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        if (!response.ok) throw new Error('Falha ao deletar encomenda');
+        showAlert('Encomenda deletada com sucesso!');
+        carregarEncomendas();
+      } catch (error) {
+        console.error('Erro ao deletar encomenda:', error);
+        alert('Erro ao deletar encomenda.');
+      }
+    }
+  </script>
+</body>
+
+</html>

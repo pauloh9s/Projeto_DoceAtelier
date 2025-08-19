@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Carrinho - Minha Confeitaria</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-amber-50 antialiased text-gray-800 flex flex-col min-h-screen">
+
+    <div id="alert-message" class="hidden fixed top-0 left-1/2 -translate-x-1/2 mt-4 z-50 w-full max-w-lg mx-auto px-4">
+    </div>
+
+    <header class="bg-white shadow-md py-4 fixed w-full top-0 z-40">
+        <div class="container mx-auto px-6 flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+                <a href="../index.html" class="flex items-center">
+                    <img src="../assets/header_logo.png" alt="Logo da Minha Confeitaria" class="h-12 sm:h-16">
+                </a>
+            </h1>
+            <nav class="flex items-center mt-2 sm:mt-0 space-x-4 sm:space-x-6 text-sm sm:text-base">
+                <a href="../index.html"
+                    class="text-amber-800 hover:text-amber-600 transition-colors font-semibold">Produtos</a>
+                <a href="./carrinho.html"
+                    class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg font-bold transition-all transform hover:scale-105 shadow-lg flex items-center space-x-2">
+                    <span class="hidden sm:inline">Carrinho</span>
+                    <i class="fa-solid fa-cart-shopping"></i>
+                    <span id="cart-count"
+                        class="bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="pt-24 flex-auto">
+        <main class="container mx-auto px-6 py-8 sm:py-12">
+            <h2 class="text-2xl sm:text-4xl font-extrabold text-amber-800 text-center mb-8">
+                Seu Carrinho
+            </h2>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-10">
+                <div class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 flex flex-col h-full">
+                    <h3 class="text-lg sm:text-2xl font-bold text-gray-700 mb-4 sm:mb-6 border-b pb-4">Itens
+                        Selecionados</h3>
+                    <div id="listaCarrinho" class="flex-grow space-y-3 sm:space-y-4 mb-4 sm:mb-6 overflow-y-auto">
+                    </div>
+                    <div class="border-t pt-4 mt-auto">
+                        <div class="flex justify-between items-center text-xl sm:text-2xl font-bold text-amber-800">
+                            <span>Total</span>
+                            <span id="totalCarrinho">R$ 0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 mt-6">
+                        <button onclick="limparCarrinho()"
+                            class="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-sm">
+                            <i class="fas fa-trash-alt mr-2"></i>Limpar Carrinho
+                        </button>
+                        <button id="finalizarCompraBtn" onclick="mostrarFormulario()"
+                            class="w-full sm:w-auto flex-grow bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-sm">
+                            Finalizar Compra
+                        </button>
+                    </div>
+                </div>
+
+                <div id="formularioCompra" class="bg-white rounded-2xl shadow-xl p-6 sm:p-8 hidden">
+                    <h3 class="text-lg sm:text-2xl font-bold text-gray-700 mb-4 sm:mb-6 border-b pb-4">Informações para
+                        entrega</h3>
+                    <form onsubmit="enviarEncomenda(event)" class="space-y-4">
+                        <div>
+                            <label for="cliente_nome"
+                                class="block text-sm font-medium text-gray-700 mb-1">Nome:</label>
+                            <input type="text" id="cliente_nome" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors text-sm">
+                        </div>
+                        <div>
+                            <label for="cliente_email"
+                                class="block text-sm font-medium text-gray-700 mb-1">Email:</label>
+                            <input type="email" id="cliente_email" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors text-sm">
+                        </div>
+                        <div>
+                            <label for="endereco"
+                                class="block text-sm font-medium text-gray-700 mb-1">Endereço:</label>
+                            <input type="text" id="endereco" required
+                                class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors text-sm">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="numero"
+                                    class="block text-sm font-medium text-gray-700 mb-1">Número:</label>
+                                <input type="text" id="numero" required
+                                    class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors text-sm">
+                            </div>
+                            <div>
+                                <label for="forma_pagamento"
+                                    class="block text-sm font-medium text-gray-700 mb-1">Pagamento:</label>
+                                <select id="forma_pagamento"
+                                    class="w-full bg-gray-100 border border-gray-300 rounded-lg p-2.5 focus:ring-2 focus:ring-amber-500 transition-colors text-sm">
+                                    <option>Pix</option>
+                                    <option>Dinheiro</option>
+                                    <option>Cartão</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-4 rounded-xl transition-colors shadow-md text-sm mt-4">
+                            Enviar Pedido
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-amber-900 text-white py-8 mt-auto">
+        <div class="container mx-auto px-6 text-center">
+            <p>&copy; 2025 Minha Confeitaria</p>
+        </div>
+    </footer>
+
+    <script>
+        let idsSelecionados = [];
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alert-message');
+            let colorClasses = '';
+            let iconPath = '';
+            let closeButtonColor = '';
+
+            if (type === 'success') {
+                colorClasses = 'text-green-800 border-green-300 bg-green-50';
+                closeButtonColor = 'bg-green-50 text-green-500 hover:bg-green-200';
+                iconPath = `<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm9.5 9.5h-10a1 1 0 0 1 0-2h10a1 1 0 0 1 0 2Z"/>`;
+            } else if (type === 'error') {
+                colorClasses = 'text-red-800 border-red-300 bg-red-50';
+                closeButtonColor = 'bg-red-50 text-red-500 hover:bg-red-200';
+                iconPath = `<path d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM10 15a1 1 0 1 1 0-2 1 1 0 0 1 0 2Zm1-4H9a1 1 0 0 1 0-2h2a1 1 0 1 1 0 2Z"/>`;
+            }
+
+            alertBox.innerHTML = `
+                <div class="flex items-center p-4 rounded-xl border-t-4 shadow-lg ${colorClasses}" role="alert">
+                    <svg class="flex-shrink-0 w-4 h-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        ${iconPath}
+                    </svg>
+                    <div class="ml-3 text-sm font-medium">
+                        ${message}
+                    </div>
+                    <button type="button" onclick="hideAlert()" class="ml-auto -mx-1.5 -my-1.5 p-1.5 rounded-lg focus:ring-2 inline-flex items-center justify-center h-8 w-8 ${closeButtonColor}">
+                        <span class="sr-only">Fechar</span>
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                    </button>
+                </div>
+            `;
+            alertBox.classList.remove('hidden');
+
+            setTimeout(() => {
+                hideAlert();
+            }, 3000);
+        }
+
+        function hideAlert() {
+            document.getElementById('alert-message').classList.add('hidden');
+        }
+
+        function atualizarContadorCarrinho() {
+            const carrinho = JSON.parse(localStorage.getItem('carrinho') || '[]');
+            document.getElementById('cart-count').textContent = carrinho.length;
+        }
+
+        async function carregarCarrinho() {
+            let idsComDuplicatas = JSON.parse(localStorage.getItem('carrinho') || '[]');
+
+            if (idsComDuplicatas.length === 0) {
+                idsComDuplicatas = JSON.parse(localStorage.getItem('compraDireta') || '[]');
+            }
+
+            // Mapeia os IDs para o novo formato de objeto com quantidade
+            const carrinhoAgrupado = {};
+            idsComDuplicatas.forEach(id => {
+                carrinhoAgrupado[id] = (carrinhoAgrupado[id] || 0) + 1;
+            });
+
+            idsSelecionados = Object.keys(carrinhoAgrupado).map(id => ({
+                id: parseInt(id),
+                quantidade: carrinhoAgrupado[id]
+            }));
+
+            const produtos = await fetch('/api/produtos').then(res => res.json());
+            const lista = document.getElementById('listaCarrinho');
+            lista.innerHTML = '';
+
+            let total = 0;
+            const finalizarCompraBtn = document.getElementById('finalizarCompraBtn');
+
+            if (idsSelecionados.length === 0) {
+                lista.innerHTML = `<p class="text-center text-gray-500">Seu carrinho está vazio.</p>`;
+                finalizarCompraBtn.disabled = true;
+            } else {
+                finalizarCompraBtn.disabled = false;
+
+                // Criar um novo array com os detalhes completos dos produtos
+                const produtosCompletos = idsSelecionados.map(item => {
+                    const produtoCompleto = produtos.find(prod => prod.id === item.id);
+                    if (produtoCompleto) {
+                        return {
+                            id: produtoCompleto.id,
+                            nome: produtoCompleto.nome,
+                            preco: produtoCompleto.preco,
+                            imagem_url: produtoCompleto.imagem_url,
+                            quantidade: item.quantidade
+                        };
+                    }
+                    return null;
+                }).filter(p => p !== null); // Filtra produtos que não foram encontrados
+
+                // Substituir a variável global idsSelecionados por este novo array
+                idsSelecionados = produtosCompletos;
+
+                // Iterar sobre o novo array para renderizar a lista
+                idsSelecionados.forEach(item => {
+                    const subtotal = item.preco * item.quantidade;
+                    const div = document.createElement('div');
+                    div.className = 'flex items-center justify-between p-3 rounded-lg bg-gray-100 text-sm';
+                    div.innerHTML = `
+            <div class="font-semibold flex-1">${item.nome}</div>
+            <div class="flex items-center space-x-2">
+                <button onclick="diminuirQuantidade(${item.id})" class="text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded-lg">-</button>
+                <span class="w-6 text-center font-bold">${item.quantidade}</span>
+                <button onclick="aumentarQuantidade(${item.id})" class="text-green-500 hover:text-green-700 font-bold px-2 py-1 rounded-lg">+</button>
+            </div>
+            <div class="w-24 text-right font-semibold text-amber-700">R$ ${subtotal.toFixed(2)}</div>
+        `;
+                    lista.appendChild(div);
+                    total += subtotal;
+                });
+            }
+
+            document.getElementById('totalCarrinho').textContent = `R$ ${total.toFixed(2)}`;
+        }
+
+        // Função para atualizar o localStorage com a nova estrutura
+        function salvarCarrinho() {
+            let novoCarrinho = [];
+            idsSelecionados.forEach(item => {
+                for (let i = 0; i < item.quantidade; i++) {
+                    novoCarrinho.push(item.id);
+                }
+            });
+            localStorage.setItem('carrinho', JSON.stringify(novoCarrinho));
+            localStorage.removeItem('compraDireta'); // Garante que a compra direta seja limpa
+        }
+        // Função para aumentar a quantidade de um produto
+        function aumentarQuantidade(id) {
+            const item = idsSelecionados.find(p => p.id === id);
+            if (item) {
+                item.quantidade++;
+                salvarCarrinho(idsSelecionados);
+                carregarCarrinho();
+                atualizarContadorCarrinho();
+            }
+        }
+
+        // Função para diminuir a quantidade de um produto
+        function diminuirQuantidade(id) {
+            const itemIndex = idsSelecionados.findIndex(p => p.id === id);
+            if (itemIndex > -1) {
+                if (idsSelecionados[itemIndex].quantidade > 1) {
+                    idsSelecionados[itemIndex].quantidade--;
+                } else {
+                    // Remove o item se a quantidade chegar a 0
+                    idsSelecionados.splice(itemIndex, 1);
+                }
+                salvarCarrinho(idsSelecionados);
+                carregarCarrinho();
+                atualizarContadorCarrinho();
+            }
+        }
+
+        function mostrarFormulario() {
+            document.getElementById('formularioCompra').classList.remove('hidden');
+        }
+
+        async function enviarEncomenda(e) {
+            e.preventDefault();
+            const agora = new Date();
+            const produtosDetalhes = idsSelecionados.map(item => ({
+                id: item.id,
+                quantidade: item.quantidade,
+                // Inclua outros detalhes importantes do produto se disponíveis no front-end
+                nome: item.nome,
+                preco: item.preco,
+                imagem_url: item.imagem_url
+            }));
+
+            const data = {
+                cliente_nome: document.getElementById('cliente_nome').value,
+                cliente_email: document.getElementById('cliente_email').value,
+                endereco: document.getElementById('endereco').value,
+                numero: document.getElementById('numero').value,
+                forma_pagamento: document.getElementById('forma_pagamento').value,
+                data_encomenda: agora.toISOString(), // Adiciona a data atual
+                produtos: produtosDetalhes // Envia um array de objetos completos
+            };
+
+            try {
+                const res = await fetch('/api/encomendas', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (res.ok) {
+                    showAlert('Pedido enviado com sucesso! Obrigado pela sua compra.', 'success');
+                    localStorage.removeItem('carrinho');
+                    localStorage.removeItem('compraDireta');
+                    setTimeout(() => {
+                        window.location.href = '../index.html';
+                    }, 3000);
+                } else {
+                    throw new Error('Erro ao enviar pedido.');
+                }
+            } catch (error) {
+                console.error('Erro ao enviar pedido:', error);
+                showAlert('Ocorreu um erro ao enviar seu pedido. Por favor, tente novamente.', 'error');
+            }
+        }
+
+        function limparCarrinho() {
+            localStorage.removeItem('carrinho');
+            localStorage.removeItem('compraDireta');
+            window.location.reload();
+        }
+
+        carregarCarrinho();
+        atualizarContadorCarrinho();
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,120 @@
+@import url('https://fonts.googleapis.com/css2?family=Playball&family=Poppins:wght@400;500&display=swap');
+
+body {
+    background-color: #fdf5ec;
+    /* background-color: white; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.container {
+    width: 900px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: white;
+    padding: 64px;
+    border-radius: 10px;
+}
+
+.container-login {
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.logo {
+    font-family: 'Playball', cursive;
+    font-size: 6rem;
+    color: #e4b3a5;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 400px;
+    height: auto;
+    margin-left: 10px;
+    filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.2));
+}
+
+.logo img:hover {
+    width: 420px;
+    transition: 0.3s ease;
+}
+
+.login-box {
+    background-color: #e4b3a5;
+    padding: 40px;
+    border-radius: 25px;
+    /* box-shadow: -10px 10px 15px rgba(0, 0, 0, 1.5), -10px -10px 15px rgba(255, 255, 255, 0.7); */
+    box-shadow: -10px 10px 15px rgba(211, 160, 145, 0.5), -10px -10px 15px rgba(255, 255, 255, 0.7);
+    width: 300px;
+}
+
+.login-logo {
+    font-family: 'Playball', cursive;
+    font-size: 2rem;
+    color: #fdf5ec;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.login-logo img {
+    width: 30px;
+    height: auto;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.input-field {
+    background-color: #fdf5ec;
+    border: 1px solid #d3a091;
+    border-radius: 10px;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
+    font-size: 1rem;
+    border: 2px solid #d3a091;
+    color: #b08a7e;
+
+}
+
+input::placeholder {
+    color: #d3a091;
+    /* Cor hexadecimal definida */
+    opacity: 1;
+    /* Garantir que a cor seja totalmente visível */
+}
+
+input:focus {
+    border-color: #fdf5ec;
+    /* border-color: #d3a091; */
+    /* Cor da borda quando o input está selecionado */
+    outline: none;
+    /* Remove o outline padrão do navegador (opcional) */
+}
+
+.login-button {
+    box-sizing: border-box;
+    background-color: #fdf5ec;
+    border: 2px solid #d3a091;
+    border-radius: 10px;
+    width: 100%;
+    padding: 15px;
+    font-size: 1.2rem;
+    color: #b08a7e;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.login-button:hover {
+    background-color: #f5e9da;
+}
