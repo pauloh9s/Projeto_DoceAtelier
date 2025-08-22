@@ -1,10 +1,11 @@
 {
   "name": "projeto_doceatelier",
   "version": "1.0.0",
-  "description": "> Este repositório é dedicado ao desenvolvimento de um sistema de delivery, com cardápio digital e administração de pedidos para a Confeitaria Doce Atelier",
+  "description": "Sistema de delivery, cardápio digital e administração de pedidos para a Confeitaria Doce Atelier",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js",
+    "dev": "nodemon backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -25,5 +26,8 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.0.2",
     "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
